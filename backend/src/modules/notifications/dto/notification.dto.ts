@@ -7,6 +7,7 @@ import {
   IsDate,
   IsMongoId,
   IsNumber,
+  IsArray,
   Min,
   Max,
   MinLength,
@@ -14,7 +15,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { NotificationType, NotificationPriority, NotificationStatus } from '../notification.schema';
+import { NotificationType, NotificationPriority, NotificationStatus, NotificationData } from '../notification.schema';
 
 // SOLID: Single Responsibility Principle - Her DTO tek bir işlem için
 
@@ -37,14 +38,7 @@ export class CreateNotificationDto {
 
   @IsOptional()
   @IsObject()
-  data?: {
-    taskId?: string;
-    groupId?: string;
-    userId?: string;
-    message?: string;
-    url?: string;
-    metadata?: Record<string, any>;
-  };
+  data?: NotificationData;
 
   @IsOptional()
   @IsEnum(NotificationPriority, { message: 'Geçerli bir öncelik seviyesi seçiniz' })
@@ -107,7 +101,8 @@ export class CreateNotificationDto {
 }
 
 export class BulkCreateNotificationDto {
-  @IsMongoId({ message: 'Geçerli kullanıcı ID\'leri giriniz' }, { each: true })
+  @IsArray()
+  @IsMongoId({ each: true, message: 'Geçerli kullanıcı ID\'leri giriniz' })
   userIds: string[];
 
   @IsEnum(NotificationType, { message: 'Geçerli bir bildirim türü seçiniz' })
@@ -225,7 +220,8 @@ export class NotificationFilterDto {
 }
 
 export class MarkAsReadDto {
-  @IsMongoId({ message: 'Geçerli bildirim ID\'leri giriniz' }, { each: true })
+  @IsArray()
+  @IsMongoId({ each: true, message: 'Geçerli bildirim ID\'leri giriniz' })
   notificationIds: string[];
 }
 

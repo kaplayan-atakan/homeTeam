@@ -1,7 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type MusicIntegrationDocument = MusicIntegration & Document;
+export interface MusicIntegrationMethods {
+  isTokenExpired(): boolean;
+  findPlaylistById(playlistId: string): Playlist | undefined;
+  addPlaylist(playlist: Playlist): void;
+  removePlaylist(playlistId: string): void;
+}
+
+export type MusicIntegrationDocument = MusicIntegration & Document & MusicIntegrationMethods;
 
 export enum MusicProvider {
   SPOTIFY = 'spotify',

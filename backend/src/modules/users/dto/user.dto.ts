@@ -1,5 +1,5 @@
 import { IsEmail, IsString, IsOptional, IsEnum, MinLength, IsPhoneNumber } from 'class-validator';
-import { UserRole, UserStatus } from './user.schema';
+import { UserRole, UserStatus } from '../user.schema';
 
 // SOLID: Single Responsibility Principle - Her DTO tek bir sorumluluğa sahip
 

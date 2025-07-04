@@ -41,6 +41,9 @@ export interface NotificationData {
   userId?: string;
   message?: string;
   url?: string;
+  assignedBy?: string;
+  timeLeft?: number;
+  inviteToken?: string;
   metadata?: Record<string, any>;
 }
 

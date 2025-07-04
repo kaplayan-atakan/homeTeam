@@ -99,7 +99,7 @@ export class MusicService {
   }
 
   // Token yenileme
-  async refreshToken(userId: string, refreshDto: RefreshTokenDto): Promise<MusicIntegration> {
+  async refreshToken(userId: string, refreshDto: RefreshTokenDto): Promise<MusicIntegrationDocument> {
     const integration = await this.findIntegration(userId, refreshDto.provider);
 
     if (!integration.refreshToken) {
@@ -123,7 +123,7 @@ export class MusicService {
   }
 
   // Kullanıcının müzik entegrasyonlarını getirme
-  async getUserIntegrations(userId: string): Promise<MusicIntegration[]> {
+  async getUserIntegrations(userId: string): Promise<MusicIntegrationDocument[]> {
     return this.musicIntegrationModel.find({
       userId: new Types.ObjectId(userId),
       isActive: true

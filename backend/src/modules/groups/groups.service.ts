@@ -179,7 +179,7 @@ export class GroupsService {
   }
 
   // ID ile grup bulma
-  async findById(id: string): Promise<Group> {
+  async findById(id: string): Promise<GroupDocument> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Geçersiz grup ID');
     }
@@ -577,7 +577,7 @@ export class GroupsService {
   }
 
   // Kullanıcının gruplarını getirme
-  async getUserGroups(userId: string): Promise<Group[]> {
+  async getUserGroups(userId: string): Promise<GroupDocument[]> {
     return this.groupModel
       .find({
         'members.userId': userId,
@@ -586,5 +586,10 @@ export class GroupsService {
       .populate('owner', 'firstName lastName email profileImage')
       .sort({ updatedAt: -1 })
       .exec();
+  }
+
+  // Alias for findUserGroups (used by WebSocket)
+  async findUserGroups(userId: string): Promise<GroupDocument[]> {
+    return this.getUserGroups(userId);
   }
 }

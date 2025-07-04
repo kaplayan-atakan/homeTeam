@@ -67,13 +67,13 @@ export class Task {
   @Prop({ 
     type: Types.ObjectId, 
     ref: 'Group', 
-    required: true 
+    required: false 
   })
-  group: Types.ObjectId;
+  groupId?: Types.ObjectId;
 
-  // SLA (Service Level Agreement) - Kaç saat içinde tamamlanmalı
-  @Prop({ required: true, min: 1 })
-  slaHours: number;
+  // SLA (Service Level Agreement) - Kaç dakika içinde tamamlanmalı
+  @Prop({ required: false, min: 1 })
+  slaMinutes?: number;
 
   // Başlangıç ve bitiş tarihleri
   @Prop({ default: new Date() })
@@ -85,19 +85,75 @@ export class Task {
   @Prop({ default: null })
   completedAt?: Date;
 
+  // Tamamlayan kullanıcı
+  @Prop({ 
+    type: Types.ObjectId, 
+    ref: 'User', 
+    required: false 
+  })
+  completedBy?: Types.ObjectId;
+
+  // Tamamlama notu
+  @Prop({ default: null })
+  completionNote?: string;
+
+  // Gerçekte geçen süre (dakika)
+  @Prop({ default: null })
+  actualTime?: number;
+
   // Tekrarlanan görev ayarları
   @Prop({ 
     type: String, 
     enum: RecurrenceType, 
     default: RecurrenceType.NONE 
   })
-  recurrence: RecurrenceType;
+  recurrenceType: RecurrenceType;
 
-  @Prop({ default: null })
-  recurrenceInterval?: number; // Kaç günde/haftada bir tekrarlanacak
+  @Prop({ type: Object, default: null })
+  recurrenceConfig?: {
+    interval?: number;
+    endDate?: Date;
+    maxOccurrences?: number;
+  };
 
   @Prop({ default: null })
   parentTaskId?: Types.ObjectId; // Tekrarlanan görevlerin ana görevi
+
+  // SLA deadline
+  @Prop({ default: null })
+  slaDeadline?: Date;
+
+  // Görev etiketleri
+  @Prop({ 
+    type: [String], 
+    default: [] 
+  })
+  tags: string[];
+
+  // Alt görevler
+  @Prop({ 
+    type: [Types.ObjectId], 
+    ref: 'Task',
+    default: [] 
+  })
+  subtasks: Types.ObjectId[];
+
+  // Aktivite logu
+  @Prop({ 
+    type: [{ 
+      action: String,
+      userId: { type: Types.ObjectId, ref: 'User' },
+      timestamp: { type: Date, default: Date.now },
+      details: Object
+    }],
+    default: [] 
+  })
+  activityLog: Array<{
+    action: string;
+    userId: Types.ObjectId;
+    timestamp: Date;
+    details?: any;
+  }>;
 
   // Müzik entegrasyonu
   @Prop({ 
@@ -105,9 +161,10 @@ export class Task {
     default: null 
   })
   musicSettings?: {
-    spotifyPlaylistId?: string;
-    youtubePlaylistId?: string;
-    autoPlay: boolean;
+    playlistId?: string;
+    provider?: 'spotify' | 'youtube';
+    autoStart?: boolean;
+    autoStop?: boolean;
   };
 
   // Görev kategorisi (ev işleri tipi)
@@ -179,6 +236,6 @@ export const TaskSchema = SchemaFactory.createForClass(Task);
 
 // Index'ler - performans için
 TaskSchema.index({ assignedTo: 1, status: 1 });
-TaskSchema.index({ group: 1, dueDate: 1 });
+TaskSchema.index({ groupId: 1, dueDate: 1 });
 TaskSchema.index({ status: 1, dueDate: 1 });
 TaskSchema.index({ createdBy: 1 });

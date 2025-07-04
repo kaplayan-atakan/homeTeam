@@ -84,14 +84,14 @@ export class NotificationsService {
           : undefined,
       }));
 
-      const savedNotifications = await this.notificationModel.insertMany(notifications);
+      const savedNotifications = await this.notificationModel.insertMany(notifications) as NotificationDocument[];
 
       // Gönderim işlemlerini başlat
       for (const notification of savedNotifications) {
-        await this.sendNotification(notification);
+        await this.sendNotification(notification as NotificationDocument);
       }
 
-      return savedNotifications;
+      return savedNotifications as Notification[];
     } catch (error) {
       this.logger.error('Toplu bildirim oluşturma hatası:', error);
       throw new BadRequestException('Bildirimler oluşturulamadı');

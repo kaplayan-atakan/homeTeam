@@ -158,6 +158,10 @@ export class RemoveMemberDto {
 export class JoinGroupDto {
   @IsString({ message: 'Davet kodu gereklidir' })
   inviteCode: string;
+
+  @IsOptional()
+  @IsString({ message: 'Geçerli bir davet token\'ı giriniz' })
+  inviteToken?: string;
 }
 
 export class AddMemberDto {

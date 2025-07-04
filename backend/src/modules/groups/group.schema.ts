@@ -1,7 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type GroupDocument = Group & Document;
+export interface GroupMethods {
+  isMember(userId: string): boolean;
+  getMemberRole(userId: string): MemberRole | null;
+  canUserPerformAction(userId: string, action: keyof GroupMember['permissions']): boolean;
+}
+
+export type GroupDocument = Group & Document & GroupMethods;
 
 export enum GroupType {
   FAMILY = 'family',        // Aile
