@@ -8,9 +8,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 // Screens
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
-import TaskListScreen from '../screens/tasks/TaskListScreen';
+import DashboardScreen from '../screens/DashboardScreen';
+import TasksScreen from '../screens/TasksScreen';
+import CreateTaskScreen from '../screens/CreateTaskScreen';
 import TaskDetailScreen from '../screens/tasks/TaskDetailScreen';
-import CreateTaskScreen from '../screens/tasks/CreateTaskScreen';
 import GroupListScreen from '../screens/groups/GroupListScreen';
 import GroupDetailScreen from '../screens/groups/GroupDetailScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
@@ -60,8 +61,8 @@ function TaskStackNavigator() {
       }}
     >
       <TaskStack.Screen 
-        name="TaskList" 
-        component={TaskListScreen} 
+        name="Tasks" 
+        component={TasksScreen} 
         options={{ title: 'Görevlerim' }}
       />
       <TaskStack.Screen 
@@ -135,6 +136,9 @@ function MainTabNavigator() {
           let iconName: string;
 
           switch (route.name) {
+            case 'Dashboard':
+              iconName = 'dashboard';
+              break;
             case 'Tasks':
               iconName = 'assignment';
               break;
@@ -155,6 +159,11 @@ function MainTabNavigator() {
         headerShown: false,
       })}
     >
+      <Tab.Screen 
+        name="Dashboard" 
+        component={DashboardScreen} 
+        options={{ tabBarLabel: 'Anasayfa' }}
+      />
       <Tab.Screen 
         name="Tasks" 
         component={TaskStackNavigator} 

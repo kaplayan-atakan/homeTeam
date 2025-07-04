@@ -6,6 +6,7 @@ import { combineReducers } from '@reduxjs/toolkit';
 // Slices
 import authReducer from './slices/authSlice';
 import tasksReducer from './slices/tasksSlice';
+import groupsReducer from './slices/groupsSlice';
 
 // Persist configuration
 const persistConfig = {
@@ -24,7 +25,7 @@ const authPersistConfig = {
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   tasks: tasksReducer,
-  // groups: groupsReducer, // Eklenecek
+  groups: groupsReducer,
   // notifications: notificationsReducer, // Eklenecek
 });
 
