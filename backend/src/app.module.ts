@@ -5,8 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 // Modüller - SOLID: Single Responsibility Principle
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
-import { TasksModule } from './modules/tasks/tasks.module';
+import { GroupsModule } from './modules/groups/groups.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { TasksModule } from './modules/tasks/tasks.module';
 import { MusicModule } from './modules/music/music.module';
 import { WebsocketModule } from './websocket/websocket.module';
 
@@ -30,10 +31,11 @@ import { WebsocketModule } from './websocket/websocket.module';
     // İş mantığı modülleri - Modüler mimari
     AuthModule,
     UsersModule,
-    TasksModule,
+    GroupsModule,
     NotificationsModule,
     MusicModule,
-    WebsocketModule,
+    // TasksModule,
+    // WebsocketModule,
   ],
   controllers: [],
   providers: [],
