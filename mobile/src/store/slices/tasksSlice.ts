@@ -1,70 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { tasksService } from '../../services/api/tasksService';
-
-export interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'overdue' | 'cancelled';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  assignedTo: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    profileImage?: string;
-  };
-  createdBy: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    profileImage?: string;
-  };
-  group: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-  dueDate: string;
-  startDate?: string;
-  completedAt?: string;
-  slaHours: number;
-  slaDeadline: string;
-  estimatedDuration?: number;
-  points?: number;
-  category?: string;
-  comments?: TaskComment[];
-  subtasks?: Task[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface TaskComment {
-  id: string;
-  content: string;
-  userId: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    profileImage?: string;
-  };
-  createdAt: string;
-}
-
-export interface TaskFilter {
-  status?: string;
-  priority?: string;
-  assignedTo?: string;
-  group?: string;
-  category?: string;
-  startDate?: string;
-  endDate?: string;
-  overdue?: boolean;
-  search?: string;
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}
+import { TaskService, GetTasksParams, TaskFilters } from '../../services/taskService';
+import { Task, CreateTaskDto, UpdateTaskDto, CompleteTaskDto, TaskStatus, TaskPriority } from '../../types/task.types';
 
 export interface TasksState {
   tasks: Task[];
@@ -80,8 +16,11 @@ export interface TasksState {
   isCreating: boolean;
   isUpdating: boolean;
   error: string | null;
-  filter: TaskFilter;
+  filters: TaskFilters;
 }
+
+// Create service instance
+const taskService = new TaskService();
 
 const initialState: TasksState = {
   tasks: [],
@@ -97,15 +36,15 @@ const initialState: TasksState = {
   isCreating: false,
   isUpdating: false,
   error: null,
-  filter: {},
+  filters: {},
 };
 
 // Async thunks
 export const fetchTasksAsync = createAsyncThunk(
   'tasks/fetchTasks',
-  async (filter: TaskFilter = {}, { rejectWithValue }) => {
+  async (params: GetTasksParams = {}, { rejectWithValue }) => {
     try {
-      const response = await tasksService.getTasks(filter);
+      const response = await taskService.getTasks(params);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Görevler yüklenemedi');
@@ -117,7 +56,7 @@ export const fetchTaskByIdAsync = createAsyncThunk(
   'tasks/fetchTaskById',
   async (taskId: string, { rejectWithValue }) => {
     try {
-      const response = await tasksService.getTaskById(taskId);
+      const response = await taskService.getTaskById(taskId);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Görev bulunamadı');
@@ -127,9 +66,9 @@ export const fetchTaskByIdAsync = createAsyncThunk(
 
 export const createTaskAsync = createAsyncThunk(
   'tasks/createTask',
-  async (taskData: Partial<Task>, { rejectWithValue }) => {
+  async (taskData: CreateTaskDto, { rejectWithValue }) => {
     try {
-      const response = await tasksService.createTask(taskData);
+      const response = await taskService.createTask(taskData);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Görev oluşturulamadı');
@@ -139,9 +78,9 @@ export const createTaskAsync = createAsyncThunk(
 
 export const updateTaskAsync = createAsyncThunk(
   'tasks/updateTask',
-  async ({ taskId, taskData }: { taskId: string; taskData: Partial<Task> }, { rejectWithValue }) => {
+  async ({ taskId, taskData }: { taskId: string; taskData: UpdateTaskDto }, { rejectWithValue }) => {
     try {
-      const response = await tasksService.updateTask(taskId, taskData);
+      const response = await taskService.updateTask(taskId, taskData);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Görev güncellenemedi');
@@ -151,9 +90,9 @@ export const updateTaskAsync = createAsyncThunk(
 
 export const completeTaskAsync = createAsyncThunk(
   'tasks/completeTask',
-  async ({ taskId, comment }: { taskId: string; comment?: string }, { rejectWithValue }) => {
+  async ({ taskId, data }: { taskId: string; data: CompleteTaskDto }, { rejectWithValue }) => {
     try {
-      const response = await tasksService.completeTask(taskId, { comment });
+      const response = await taskService.completeTask(taskId, data);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Görev tamamlanamadı');
@@ -165,7 +104,7 @@ export const deleteTaskAsync = createAsyncThunk(
   'tasks/deleteTask',
   async (taskId: string, { rejectWithValue }) => {
     try {
-      await tasksService.deleteTask(taskId);
+      await taskService.deleteTask(taskId);
       return taskId;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Görev silinemedi');
@@ -175,48 +114,12 @@ export const deleteTaskAsync = createAsyncThunk(
 
 export const fetchMyTasksAsync = createAsyncThunk(
   'tasks/fetchMyTasks',
-  async (filter: TaskFilter = {}, { rejectWithValue }) => {
+  async (params: GetTasksParams = {}, { rejectWithValue }) => {
     try {
-      const response = await tasksService.getMyTasks(filter);
+      const response = await taskService.getMyTasks(params);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Görevlerim yüklenemedi');
-    }
-  }
-);
-
-export const fetchPendingTasksAsync = createAsyncThunk(
-  'tasks/fetchPendingTasks',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await tasksService.getPendingTasks();
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Bekleyen görevler yüklenemedi');
-    }
-  }
-);
-
-export const fetchCompletedTasksAsync = createAsyncThunk(
-  'tasks/fetchCompletedTasks',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await tasksService.getCompletedTasks();
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Tamamlanan görevler yüklenemedi');
-    }
-  }
-);
-
-export const addCommentAsync = createAsyncThunk(
-  'tasks/addComment',
-  async ({ taskId, comment }: { taskId: string; comment: string }, { rejectWithValue }) => {
-    try {
-      const response = await tasksService.addComment(taskId, { comment });
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Yorum eklenemedi');
     }
   }
 );
@@ -229,11 +132,11 @@ const tasksSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    setFilter: (state, action: PayloadAction<TaskFilter>) => {
-      state.filter = { ...state.filter, ...action.payload };
+    setFilters: (state, action: PayloadAction<TaskFilters>) => {
+      state.filters = { ...state.filters, ...action.payload };
     },
-    clearFilter: (state) => {
-      state.filter = {};
+    clearFilters: (state) => {
+      state.filters = {};
     },
     setCurrentTask: (state, action: PayloadAction<Task | null>) => {
       state.currentTask = action.payload;
@@ -314,10 +217,11 @@ const tasksSlice = createSlice({
       })
       .addCase(fetchTasksAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.tasks = action.payload.data?.tasks || [];
-        state.totalTasks = action.payload.data?.total || 0;
-        state.currentPage = action.payload.data?.page || 1;
-        state.hasMore = state.tasks.length < state.totalTasks;
+        const response = action.payload;
+        state.tasks = response.data || [];
+        state.totalTasks = response.total || 0;
+        state.currentPage = response.page || 1;
+        state.hasMore = (response.data?.length || 0) < state.totalTasks;
         state.error = null;
       })
       .addCase(fetchTasksAsync.rejected, (state, action) => {
@@ -333,7 +237,7 @@ const tasksSlice = createSlice({
       })
       .addCase(fetchTaskByIdAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.currentTask = action.payload.data;
+        state.currentTask = action.payload;
         state.error = null;
       })
       .addCase(fetchTaskByIdAsync.rejected, (state, action) => {
@@ -349,7 +253,7 @@ const tasksSlice = createSlice({
       })
       .addCase(createTaskAsync.fulfilled, (state, action) => {
         state.isCreating = false;
-        const newTask = action.payload.data;
+        const newTask = action.payload;
         state.tasks.unshift(newTask);
         state.error = null;
       })
@@ -366,7 +270,7 @@ const tasksSlice = createSlice({
       })
       .addCase(updateTaskAsync.fulfilled, (state, action) => {
         state.isUpdating = false;
-        const updatedTask = action.payload.data;
+        const updatedTask = action.payload;
         tasksSlice.caseReducers.updateTaskInList(state, { 
           payload: updatedTask, 
           type: 'updateTaskInList' 
@@ -381,7 +285,7 @@ const tasksSlice = createSlice({
     // Complete Task
     builder
       .addCase(completeTaskAsync.fulfilled, (state, action) => {
-        const completedTask = action.payload.data;
+        const completedTask = action.payload;
         tasksSlice.caseReducers.updateTaskInList(state, { 
           payload: completedTask, 
           type: 'updateTaskInList' 
@@ -401,40 +305,16 @@ const tasksSlice = createSlice({
     // Fetch My Tasks
     builder
       .addCase(fetchMyTasksAsync.fulfilled, (state, action) => {
-        state.myTasks = action.payload.data?.tasks || [];
-      });
-
-    // Fetch Pending Tasks
-    builder
-      .addCase(fetchPendingTasksAsync.fulfilled, (state, action) => {
-        state.pendingTasks = action.payload.data?.tasks || [];
-      });
-
-    // Fetch Completed Tasks
-    builder
-      .addCase(fetchCompletedTasksAsync.fulfilled, (state, action) => {
-        state.completedTasks = action.payload.data?.tasks || [];
-      });
-
-    // Add Comment
-    builder
-      .addCase(addCommentAsync.fulfilled, (state, action) => {
-        const updatedTask = action.payload.data;
-        if (state.currentTask && state.currentTask.id === updatedTask.id) {
-          state.currentTask = updatedTask;
-        }
-        tasksSlice.caseReducers.updateTaskInList(state, { 
-          payload: updatedTask, 
-          type: 'updateTaskInList' 
-        });
+        const response = action.payload;
+        state.myTasks = response.data || [];
       });
   },
 });
 
 export const {
   clearError,
-  setFilter,
-  clearFilter,
+  setFilters,
+  clearFilters,
   setCurrentTask,
   updateTaskInList,
   removeTaskFromList,

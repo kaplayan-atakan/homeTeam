@@ -8,6 +8,9 @@ import authReducer from './slices/authSlice';
 import tasksReducer from './slices/tasksSlice';
 import groupsReducer from './slices/groupsSlice';
 
+// Middleware
+import { webSocketMiddleware, initializeWebSocketHandlers } from './middleware/webSocketMiddleware';
+
 // Persist configuration
 const persistConfig = {
   key: 'root',
@@ -47,16 +50,16 @@ export const store = configureStore({
           'persist/FLUSH',
         ],
       },
-    }),
+    }).concat(webSocketMiddleware),
   devTools: __DEV__, // Sadece development'te Redux DevTools aktif
 });
 
 // Persistor
 export const persistor = persistStore(store);
 
+// Initialize WebSocket handlers
+initializeWebSocketHandlers(store);
+
 // Types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-
-// Typed hooks
-export { useAppDispatch, useAppSelector } from './hooks';

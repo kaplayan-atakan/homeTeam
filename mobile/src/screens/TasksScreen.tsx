@@ -18,9 +18,9 @@ import {
   Avatar,
   IconButton,
 } from 'react-native-paper';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { TaskStatus, TaskPriority, Task } from '../types/task.types';
+import { fetchTasksAsync, updateTaskAsync, deleteTaskAsync } from '../store/slices/tasksSlice';
 
 interface TasksScreenProps {
   navigation: any;
@@ -37,16 +37,20 @@ const TasksScreen: React.FC<TasksScreenProps> = ({ navigation }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [sortMenuVisible, setSortMenuVisible] = useState(false);
 
-  const { tasks } = useSelector((state: RootState) => state.tasks);
-  const { user } = useSelector((state: RootState) => state.auth);
-  const dispatch = useDispatch();
+  const { tasks, isLoading, error } = useAppSelector((state) => state.tasks);
+  const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchTasksAsync({}));
+  }, [dispatch]);
 
   const filteredTasks = React.useMemo(() => {
     let result = tasks;
 
     // Arama filtresi
     if (searchQuery) {
-      result = result.filter(task =>
+      result = result.filter((task: Task) =>
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.description?.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -54,16 +58,21 @@ const TasksScreen: React.FC<TasksScreenProps> = ({ navigation }) => {
 
     // Durum filtresi
     if (filter !== 'all') {
-      result = result.filter(task => task.status === filter);
+      result = result.filter((task: Task) => task.status === filter);
     }
 
     // Sıralama
-    result.sort((a, b) => {
+    result.sort((a: Task, b: Task) => {
       switch (sortBy) {
         case 'dueDate':
           return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
         case 'priority':
-          const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
+          const priorityOrder: { [key in TaskPriority]: number } = { 
+            [TaskPriority.URGENT]: 4, 
+            [TaskPriority.HIGH]: 3, 
+            [TaskPriority.MEDIUM]: 2, 
+            [TaskPriority.LOW]: 1 
+          };
           return priorityOrder[b.priority] - priorityOrder[a.priority];
         case 'created':
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -80,8 +89,7 @@ const TasksScreen: React.FC<TasksScreenProps> = ({ navigation }) => {
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      // API çağrısı burada yapılacak
-      // await dispatch(fetchTasks());
+      await dispatch(fetchTasksAsync({}));
     } catch (error) {
       Alert.alert('Hata', 'Görevler yüklenirken bir hata oluştu');
     } finally {
