@@ -1,0 +1,19 @@
+# Geliştirme ortamı için Docker Compose dosyası
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Package dosyalarını kopyala
+COPY package*.json ./
+
+# Bağımlılıkları yükle
+RUN npm install
+
+# Kaynak kodları kopyala
+COPY . .
+
+# Port açık
+EXPOSE 3001
+
+# Development modunda başlat
+CMD ["npm", "run", "start:dev"]
