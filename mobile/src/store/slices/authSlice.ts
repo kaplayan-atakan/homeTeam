@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { authService } from '../../services/api/authService';
+import { authService } from '../../services/authService';
 
 export interface User {
   id: string;
@@ -36,6 +36,18 @@ export const loginAsync = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Giriş yapılamadı');
+    }
+  }
+);
+
+export const verifyTokenAsync = createAsyncThunk(
+  'auth/verifyToken',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await authService.verifyToken();
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Token doğrulanamadı');
     }
   }
 );

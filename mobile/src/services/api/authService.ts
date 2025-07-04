@@ -1,53 +1,206 @@
-import axios from 'axios';
-import { API_BASE_URL, API_ENDPOINTS } from '../constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { apiClient } from '../apiClient';
+import Config from '../../config/config';
 
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
 
-// Request interceptor - Token ekleme
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token'); // AsyncStorage kullanacağız
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+export interface RegisterData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone?: string;
+}
 
-// Response interceptor - Hata yönetimi
-apiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token süresi dolmuş, logout yap
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      // Navigation to login screen - Redux action ile yapılacak
-    }
-    return Promise.reject(error);
-  }
-);
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      profileImage?: string;
+      phone?: string;
+    };
+    token: string;
+  };
+}
 
-export const authService = {
+export class AuthService {
+  private baseUrl = '/auth';
+
   // Giriş yap
-  async login(credentials: { email: string; password: string }) {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, credentials);
+  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    const response = await apiClient.post(`${this.baseUrl}/login`, credentials);
     
     if (response.data.success && response.data.data.token) {
-      // Token'ı kaydet (AsyncStorage kullanılacak)
-      localStorage.setItem('token', response.data.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.data.user));
+      // Token'ı ve kullanıcı bilgilerini kaydet
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.AUTH_TOKEN, response.data.data.token);
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
+    }
+    
+    return response.data;
+  }
+
+  // Kayıt ol
+  async register(userData: RegisterData): Promise<AuthResponse> {
+    const response = await apiClient.post(`${this.baseUrl}/register`, userData);
+    
+    if (response.data.success && response.data.data.token) {
+      // Token'ı ve kullanıcı bilgilerini kaydet
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.AUTH_TOKEN, response.data.data.token);
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
+    }
+    
+    return response.data;
+  }
+
+  // Çıkış yap
+  async logout(): Promise<void> {
+    try {
+      // Backend'e logout isteği gönder
+      await apiClient.post(`${this.baseUrl}/logout`);
+    } catch (error) {
+      // Backend hatası olsa bile local storage'ı temizle
+      console.warn('Logout backend error:', error);
+    } finally {
+      // Local storage'ı temizle
+      await AsyncStorage.multiRemove([
+        Config.STORAGE_KEYS.AUTH_TOKEN,
+        Config.STORAGE_KEYS.USER,
+      ]);
+    }
+  }
+
+  // Token'ı doğrula
+  async verifyToken(): Promise<AuthResponse> {
+    const response = await apiClient.get(`${this.baseUrl}/verify`);
+    return response.data;
+  }
+
+  // Şifre sıfırlama isteği
+  async requestPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
+    const response = await apiClient.post(`${this.baseUrl}/forgot-password`, { email });
+    return response.data;
+  }
+
+  // Şifre sıfırla
+  async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    const response = await apiClient.post(`${this.baseUrl}/reset-password`, { 
+      token, 
+      newPassword 
+    });
+    return response.data;
+  }
+
+  // Şifre değiştir
+  async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    const response = await apiClient.patch(`${this.baseUrl}/change-password`, {
+      currentPassword,
+      newPassword
+    });
+    return response.data;
+  }
+
+  // Profil güncelle
+  async updateProfile(userData: Partial<RegisterData>): Promise<AuthResponse> {
+    const response = await apiClient.patch(`${this.baseUrl}/profile`, userData);
+    
+    if (response.data.success) {
+      // Güncellenmiş kullanıcı bilgilerini kaydet
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
+    }
+    
+    return response.data;
+  }
+
+  // Profil resmi yükle
+  async uploadProfileImage(imageFile: FormData): Promise<AuthResponse> {
+    const response = await apiClient.post(`${this.baseUrl}/upload-profile-image`, imageFile, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    if (response.data.success) {
+      // Güncellenmiş kullanıcı bilgilerini kaydet
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
+    }
+    
+    return response.data;
+  }
+
+  // Email doğrulama
+  async verifyEmail(token: string): Promise<{ success: boolean; message: string }> {
+    const response = await apiClient.post(`${this.baseUrl}/verify-email`, { token });
+    return response.data;
+  }
+
+  // Email doğrulama kodu gönder
+  async resendVerificationEmail(): Promise<{ success: boolean; message: string }> {
+    const response = await apiClient.post(`${this.baseUrl}/resend-verification`);
+    return response.data;
+  }
+
+  // OAuth Google giriş
+  async loginWithGoogle(googleToken: string): Promise<AuthResponse> {
+    const response = await apiClient.post(`${this.baseUrl}/oauth/google`, { 
+      token: googleToken 
+    });
+    
+    if (response.data.success && response.data.data.token) {
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.AUTH_TOKEN, response.data.data.token);
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
+    }
+    
+    return response.data;
+  }
+
+  // OAuth Facebook giriş
+  async loginWithFacebook(facebookToken: string): Promise<AuthResponse> {
+    const response = await apiClient.post(`${this.baseUrl}/oauth/facebook`, { 
+      token: facebookToken 
+    });
+    
+    if (response.data.success && response.data.data.token) {
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.AUTH_TOKEN, response.data.data.token);
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
+    }
+    
+    return response.data;
+  }
+
+  // Token'ı local storage'dan al
+  async getStoredToken(): Promise<string | null> {
+    return await AsyncStorage.getItem(Config.STORAGE_KEYS.AUTH_TOKEN);
+  }
+
+  // Kullanıcı bilgilerini local storage'dan al
+  async getStoredUser(): Promise<any | null> {
+    const userString = await AsyncStorage.getItem(Config.STORAGE_KEYS.USER);
+    return userString ? JSON.parse(userString) : null;
+  }
+
+  // Token'ı yenile
+  async refreshToken(): Promise<AuthResponse> {
+    const response = await apiClient.post(`${this.baseUrl}/refresh-token`);
+    
+    if (response.data.success && response.data.data.token) {
+      // Yeni token'ı kaydet
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.AUTH_TOKEN, response.data.data.token);
+      await AsyncStorage.setItem(Config.STORAGE_KEYS.USER, JSON.stringify(response.data.data.user));
+    }
+    
+    return response.data;
+  }
+}
+
+export const authService = new AuthService();
     }
     
     return response;

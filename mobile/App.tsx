@@ -3,61 +3,78 @@
  * SOLID prensiplerine uygun React Native uygulaması
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { StatusBar, Text, View, StyleSheet } from 'react-native';
+import { StatusBar } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 
 import { store, persistor } from './src/store';
+import { InitSplashScreen } from './src/screens/InitSplashScreen';
 import RootNavigator from './src/navigation/RootNavigator';
+import AuthNavigator from './src/navigation/AuthNavigator';
 
-// Basit loading component
-const LoadingScreen = () => (
-  <View style={styles.loadingContainer}>
-    <Text style={styles.loadingText}>Yükleniyor...</Text>
-  </View>
-);
+// App wrapper component
+const AppContent: React.FC = () => {
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-// Basit tema
+  const handleInitialization = (authenticated: boolean) => {
+    setIsAuthenticated(authenticated);
+    setIsInitialized(true);
+  };
+
+  if (!isInitialized) {
+    return <InitSplashScreen onInitialized={handleInitialization} />;
+  }
+
+  return isAuthenticated ? <RootNavigator /> : <AuthNavigator />;
+};
+
+// Tema konfigürasyonu
 const theme = {
   colors: {
-    primary: '#6200EE',
-    background: '#FFFFFF',
+    primary: '#2196F3',
+    primaryContainer: '#BBDEFB',
+    secondary: '#03DAC6',
+    secondaryContainer: '#B2DFDB',
     surface: '#FFFFFF',
-    text: '#000000',
+    surfaceVariant: '#F5F5F5',
+    background: '#FAFAFA',
+    error: '#B00020',
+    errorContainer: '#FDEAEA',
+    onPrimary: '#FFFFFF',
+    onSecondary: '#000000',
+    onSurface: '#000000',
+    onBackground: '#000000',
+    onError: '#FFFFFF',
+    outline: '#79747E',
+    inverseSurface: '#313033',
+    inverseOnSurface: '#F4EFF4',
+    inversePrimary: '#A8C7FA',
+    shadow: '#000000',
+    scrim: '#000000',
+    surfaceDisabled: 'rgba(0, 0, 0, 0.12)',
+    onSurfaceDisabled: 'rgba(0, 0, 0, 0.38)',
+    backdrop: 'rgba(0, 0, 0, 0.4)',
   },
 };
 
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <PersistGate loading={<LoadingScreen />} persistor={persistor}>
+      <PersistGate loading={<InitSplashScreen onInitialized={() => {}} />} persistor={persistor}>
         <PaperProvider theme={theme}>
           <StatusBar 
             barStyle="light-content" 
-            backgroundColor="#6200EE" 
+            backgroundColor="#2196F3" 
             translucent={false}
           />
-          <RootNavigator />
+          <AppContent />
         </PaperProvider>
       </PersistGate>
     </Provider>
   );
 };
-
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  loadingText: {
-    fontSize: 18,
-    color: '#6200EE',
-    fontWeight: '500',
-  },
-});
 
 export default App;
