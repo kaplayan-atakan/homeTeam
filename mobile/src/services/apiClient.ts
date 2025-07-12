@@ -178,13 +178,13 @@ class ApiClient {
     return this.instance.delete<T>(url, config);
   }
 
-  // File upload için multipart/form-data
-  async uploadFile<T = any>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.instance.post<T>(url, formData, {
+  // Dosya yükleme işlemleri için
+  async uploadFile(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return this.instance.post(url, formData, {
       ...config,
       headers: {
-        ...config?.headers,
         'Content-Type': 'multipart/form-data',
+        ...config?.headers,
       },
     });
   }

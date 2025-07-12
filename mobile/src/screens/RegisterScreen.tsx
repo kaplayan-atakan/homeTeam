@@ -20,7 +20,7 @@ interface RegisterScreenProps {
   navigation: any;
 }
 
-export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
+const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const { isLoading, error } = useAppSelector((state) => state.auth);
 
@@ -262,3 +262,5 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 });
+
+export default RegisterScreen;

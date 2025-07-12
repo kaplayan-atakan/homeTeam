@@ -3,11 +3,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSelector } from 'react-redux';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Text } from 'react-native';
 
 // Screens
-import LoginScreen from '../screens/auth/LoginScreen';
-import RegisterScreen from '../screens/auth/RegisterScreen';
+import { LoginScreen } from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import TasksScreen from '../screens/TasksScreen';
 import CreateTaskScreen from '../screens/CreateTaskScreen';
@@ -133,28 +133,28 @@ function MainTabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName: string;
+          let emoji: string;
 
           switch (route.name) {
             case 'Dashboard':
-              iconName = 'dashboard';
+              emoji = '🏠';
               break;
             case 'Tasks':
-              iconName = 'assignment';
+              emoji = '📝';
               break;
             case 'Groups':
-              iconName = 'group';
+              emoji = '👥';
               break;
             case 'Profile':
-              iconName = 'person';
+              emoji = '👤';
               break;
             default:
-              iconName = 'help';
+              emoji = '❓';
           }
 
-          return <Icon name={iconName} size={size} color={color} />;
+          return <Text style={{ fontSize: size, color: focused ? '#2196F3' : color }}>{emoji}</Text>;
         },
-        tabBarActiveTintColor: '#6200EE',
+        tabBarActiveTintColor: '#2196F3',
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
       })}
