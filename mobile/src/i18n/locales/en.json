@@ -1,0 +1,259 @@
+{
+  "common": {
+    "email": "Email",
+    "password": "Password",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh",
+    "settings": "Settings",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "language": "Language",
+    "user": "User",
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "completed": "Completed"
+  },
+  "app": {
+    "name": "homeTeam",
+    "subtitle": "Family Task Management System",
+    "welcomeBack": "Welcome Back!"
+  },
+  "auth": {
+    "loginTitle": "Login",
+    "registerTitle": "Register",
+    "forgotPasswordTitle": "Forgot Password",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "firstNameLabel": "First Name",
+    "lastNameLabel": "Last Name",
+    "loginButton": "Login",
+    "registerButton": "Create Account",
+    "forgotPasswordButton": "Forgot Password",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithFacebook": "Sign in with Facebook",
+    "orContinueWith": "or continue with",
+    "validation": {
+      "emailRequired": "Email address is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required"
+    },
+    "errors": {
+      "loginFailed": "Login failed",
+      "registerFailed": "Registration failed",
+      "invalidCredentials": "Invalid email or password",
+      "emailAlreadyExists": "This email address is already in use",
+      "networkError": "Network error. Please check your internet connection.",
+      "unknownError": "An unexpected error occurred"
+    },
+    "success": {
+      "registered": "Account created successfully",
+      "loggedIn": "Login successful",
+      "passwordResetSent": "Password reset email sent"
+    }
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "tasks": "Tasks",
+    "groups": "Groups",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "createTask": "Create Task"
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "todaysTasks": "You have {{count}} tasks today",
+    "upcomingTasks": "Upcoming Tasks",
+    "completedTasks": "Completed Tasks",
+    "overdueTasks": "Overdue Tasks",
+    "myGroups": "My Groups",
+    "recentActivity": "Recent Activity",
+    "taskSummary": "Task Summary",
+    "recentTasks": "Recent Tasks",
+    "progress": "Progress",
+    "newTask": "New Task",
+    "stats": {
+      "totalTasks": "Total Tasks",
+      "completedToday": "Completed Today",
+      "pendingTasks": "Pending Tasks",
+      "completionRate": "Completion Rate"
+    }
+  },
+  "tasks": {
+    "title": "Tasks",
+    "createNew": "New Task",
+    "myTasks": "My Tasks",
+    "assignedToMe": "Assigned to Me",
+    "assignedByMe": "Assigned by Me",
+    "allTasks": "All Tasks",
+    "taskTitle": "Task Title",
+    "taskDescription": "Task Description",
+    "assignTo": "Assign To",
+    "dueDate": "Due Date",
+    "priority": "Priority",
+    "status": "Status",
+    "category": "Category",
+    "points": "Points",
+    "attachments": "Attachments",
+    "comments": "Comments",
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "status": {
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "markComplete": "Mark Complete",
+      "markInProgress": "Start Task",
+      "assignTask": "Assign Task",
+      "deleteTask": "Delete Task",
+      "editTask": "Edit Task"
+    },
+    "validation": {
+      "titleRequired": "Task title is required",
+      "assigneeRequired": "Assignee is required",
+      "dueDateRequired": "Due date is required"
+    }
+  },
+  "groups": {
+    "title": "Groups",
+    "myGroups": "My Groups",
+    "createGroup": "Create Group",
+    "joinGroup": "Join Group",
+    "groupName": "Group Name",
+    "groupDescription": "Group Description",
+    "members": "Members",
+    "admin": "Admin",
+    "member": "Member",
+    "invite": "Invite",
+    "leave": "Leave Group",
+    "settings": "Group Settings",
+    "inviteCode": "Invite Code",
+    "joinWithCode": "Join with Code"
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "profileImage": "Profile Image",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "stats": {
+      "tasksCompleted": "Tasks Completed",
+      "tasksAssigned": "Tasks Assigned",
+      "groupsJoined": "Groups Joined",
+      "totalPoints": "Total Points"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark All Read",
+    "deleteAll": "Delete All",
+    "empty": "No notifications",
+    "types": {
+      "taskAssigned": "New task assigned",
+      "taskCompleted": "Task completed",
+      "taskOverdue": "Task overdue",
+      "taskDueSoon": "Task due soon",
+      "commentAdded": "New comment added",
+      "groupInvite": "You have a group invitation"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "about": "About",
+    "language": "Language",
+    "theme": "Theme",
+    "pushNotifications": "Push Notifications",
+    "emailNotifications": "Email Notifications",
+    "smsNotifications": "SMS Notifications",
+    "soundEnabled": "Sound Enabled",
+    "vibrationEnabled": "Vibration Enabled",
+    "themes": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "languages": {
+      "tr": "Türkçe",
+      "en": "English"
+    }
+  },
+  "music": {
+    "title": "Music",
+    "playWhenTaskStarts": "Play when task starts",
+    "spotifyPlaylist": "Spotify Playlist",
+    "youtubePlaylist": "YouTube Playlist",
+    "connectSpotify": "Connect to Spotify",
+    "connectYoutube": "Connect to YouTube",
+    "nowPlaying": "Now Playing",
+    "play": "Play",
+    "pause": "Pause",
+    "stop": "Stop",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "errors": {
+    "networkError": "Network error. Please check your internet connection.",
+    "serverError": "Server error. Please try again later.",
+    "unauthorized": "You don't have permission for this action.",
+    "notFound": "The content you're looking for was not found.",
+    "validationError": "Form information is missing or incorrect.",
+    "unknownError": "An unexpected error occurred."
+  },
+  "messages": {
+    "dataUpdated": "Data updated",
+    "taskCreated": "Task created",
+    "taskUpdated": "Task updated",
+    "taskDeleted": "Task deleted",
+    "taskCompleted": "Task completed",
+    "groupCreated": "Group created",
+    "groupJoined": "You joined the group",
+    "profileUpdated": "Profile updated",
+    "passwordChanged": "Password changed",
+    "settingsSaved": "Settings saved"
+  }
+}

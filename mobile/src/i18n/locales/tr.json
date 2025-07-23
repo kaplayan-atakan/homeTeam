@@ -1,0 +1,259 @@
+{
+  "common": {
+    "email": "Email",
+    "password": "Şifre",
+    "login": "Giriş Yap",
+    "register": "Kayıt Ol",
+    "logout": "Çıkış",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "add": "Ekle",
+    "back": "Geri",
+    "next": "İleri",
+    "finish": "Bitir",
+    "loading": "Yükleniyor...",
+    "error": "Hata",
+    "success": "Başarılı",
+    "warning": "Uyarı",
+    "info": "Bilgi",
+    "confirm": "Onayla",
+    "yes": "Evet",
+    "no": "Hayır",
+    "ok": "Tamam",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "sort": "Sırala",
+    "refresh": "Yenile",
+    "settings": "Ayarlar",
+    "profile": "Profil",
+    "notifications": "Bildirimler",
+    "language": "Dil",
+    "user": "Kullanıcı",
+    "pending": "Bekliyor",
+    "inProgress": "Devam Ediyor",
+    "completed": "Tamamlandı"
+  },
+  "app": {
+    "name": "homeTeam",
+    "subtitle": "Aile Görev Takip Sistemi",
+    "welcomeBack": "Tekrar Hoşgeldiniz!"
+  },
+  "auth": {
+    "loginTitle": "Giriş Yap",
+    "registerTitle": "Kayıt Ol",
+    "forgotPasswordTitle": "Şifremi Unuttum",
+    "emailLabel": "Email",
+    "passwordLabel": "Şifre",
+    "confirmPasswordLabel": "Şifre Tekrar",
+    "firstNameLabel": "Ad",
+    "lastNameLabel": "Soyad",
+    "loginButton": "Giriş Yap",
+    "registerButton": "Hesap Oluştur",
+    "forgotPasswordButton": "Şifremi Unuttum",
+    "alreadyHaveAccount": "Zaten hesabınız var mı?",
+    "dontHaveAccount": "Hesabınız yok mu?",
+    "signInWithGoogle": "Google ile Giriş",
+    "signInWithFacebook": "Facebook ile Giriş",
+    "orContinueWith": "veya devam edin",
+    "validation": {
+      "emailRequired": "Email adresi gereklidir",
+      "emailInvalid": "Geçerli bir email adresi giriniz",
+      "passwordRequired": "Şifre gereklidir",
+      "passwordMinLength": "Şifre en az 6 karakter olmalıdır",
+      "passwordsDoNotMatch": "Şifreler eşleşmiyor",
+      "firstNameRequired": "Ad gereklidir",
+      "lastNameRequired": "Soyad gereklidir"
+    },
+    "errors": {
+      "loginFailed": "Giriş yapılamadı",
+      "registerFailed": "Kayıt olunamadı",
+      "invalidCredentials": "Geçersiz email veya şifre",
+      "emailAlreadyExists": "Bu email adresi zaten kullanılıyor",
+      "networkError": "Ağ hatası. İnternet bağlantınızı kontrol edin.",
+      "unknownError": "Beklenmeyen bir hata oluştu"
+    },
+    "success": {
+      "registered": "Hesap başarıyla oluşturuldu",
+      "loggedIn": "Giriş başarılı",
+      "passwordResetSent": "Şifre sıfırlama maili gönderildi"
+    }
+  },
+  "navigation": {
+    "dashboard": "Anasayfa",
+    "tasks": "Görevler",
+    "groups": "Gruplar",
+    "profile": "Profil",
+    "notifications": "Bildirimler",
+    "settings": "Ayarlar",
+    "createTask": "Görev Oluştur"
+  },
+  "dashboard": {
+    "welcome": "Hoşgeldin",
+    "todaysTasks": "Bugün {{count}} görevin var",
+    "upcomingTasks": "Yaklaşan Görevler",
+    "completedTasks": "Tamamlanan Görevler",
+    "overdueTasks": "Geciken Görevler",
+    "myGroups": "Gruplarım",
+    "recentActivity": "Son Aktiviteler",
+    "taskSummary": "Görev Özeti",
+    "recentTasks": "Son Görevler",
+    "progress": "İlerleme",
+    "newTask": "Yeni Görev",
+    "stats": {
+      "totalTasks": "Toplam Görev",
+      "completedToday": "Bugün Tamamlanan",
+      "pendingTasks": "Bekleyen Görevler",
+      "completionRate": "Tamamlanma Oranı"
+    }
+  },
+  "tasks": {
+    "title": "Görevler",
+    "createNew": "Yeni Görev",
+    "myTasks": "Görevlerim",
+    "assignedToMe": "Bana Atanan",
+    "assignedByMe": "Benim Atadığım",
+    "allTasks": "Tüm Görevler",
+    "taskTitle": "Görev Başlığı",
+    "taskDescription": "Görev Açıklaması",
+    "assignTo": "Atanan Kişi",
+    "dueDate": "Bitiş Tarihi",
+    "priority": "Öncelik",
+    "status": "Durum",
+    "category": "Kategori",
+    "points": "Puan",
+    "attachments": "Ek Dosyalar",
+    "comments": "Yorumlar",
+    "priority": {
+      "low": "Düşük",
+      "medium": "Orta",
+      "high": "Yüksek",
+      "urgent": "Acil"
+    },
+    "status": {
+      "pending": "Bekliyor",
+      "inProgress": "Devam Ediyor",
+      "completed": "Tamamlandı",
+      "cancelled": "İptal Edildi"
+    },
+    "actions": {
+      "markComplete": "Tamamla",
+      "markInProgress": "Başlat",
+      "assignTask": "Görevi Ata",
+      "deleteTask": "Görevi Sil",
+      "editTask": "Görevi Düzenle"
+    },
+    "validation": {
+      "titleRequired": "Görev başlığı gereklidir",
+      "assigneeRequired": "Atanan kişi gereklidir",
+      "dueDateRequired": "Bitiş tarihi gereklidir"
+    }
+  },
+  "groups": {
+    "title": "Gruplar",
+    "myGroups": "Gruplarım",
+    "createGroup": "Grup Oluştur",
+    "joinGroup": "Gruba Katıl",
+    "groupName": "Grup Adı",
+    "groupDescription": "Grup Açıklaması",
+    "members": "Üyeler",
+    "admin": "Yönetici",
+    "member": "Üye",
+    "invite": "Davet Et",
+    "leave": "Gruptan Ayrıl",
+    "settings": "Grup Ayarları",
+    "inviteCode": "Davet Kodu",
+    "joinWithCode": "Kod ile Katıl"
+  },
+  "profile": {
+    "title": "Profil",
+    "editProfile": "Profili Düzenle",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "email": "Email",
+    "phone": "Telefon",
+    "profileImage": "Profil Resmi",
+    "changePassword": "Şifre Değiştir",
+    "currentPassword": "Mevcut Şifre",
+    "newPassword": "Yeni Şifre",
+    "confirmNewPassword": "Yeni Şifre Tekrar",
+    "stats": {
+      "tasksCompleted": "Tamamlanan Görevler",
+      "tasksAssigned": "Atanan Görevler",
+      "groupsJoined": "Katılınan Gruplar",
+      "totalPoints": "Toplam Puan"
+    }
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "markAllRead": "Tümünü Okundu İşaretle",
+    "deleteAll": "Tümünü Sil",
+    "empty": "Hiç bildirim yok",
+    "types": {
+      "taskAssigned": "Yeni görev atandı",
+      "taskCompleted": "Görev tamamlandı",
+      "taskOverdue": "Görev gecikti",
+      "taskDueSoon": "Görev yaklaşıyor",
+      "commentAdded": "Yeni yorum eklendi",
+      "groupInvite": "Grup davetiniz var"
+    }
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "general": "Genel",
+    "notifications": "Bildirimler",
+    "privacy": "Gizlilik",
+    "about": "Hakkında",
+    "language": "Dil",
+    "theme": "Tema",
+    "pushNotifications": "Push Bildirimleri",
+    "emailNotifications": "Email Bildirimleri",
+    "smsNotifications": "SMS Bildirimleri",
+    "soundEnabled": "Ses Etkin",
+    "vibrationEnabled": "Titreşim Etkin",
+    "themes": {
+      "light": "Açık",
+      "dark": "Koyu",
+      "system": "Sistem"
+    },
+    "languages": {
+      "tr": "Türkçe",
+      "en": "English"
+    }
+  },
+  "music": {
+    "title": "Müzik",
+    "playWhenTaskStarts": "Görev başladığında çal",
+    "spotifyPlaylist": "Spotify Çalma Listesi",
+    "youtubePlaylist": "YouTube Çalma Listesi",
+    "connectSpotify": "Spotify'a Bağlan",
+    "connectYoutube": "YouTube'a Bağlan",
+    "nowPlaying": "Şu an çalıyor",
+    "play": "Çal",
+    "pause": "Duraklat",
+    "stop": "Durdur",
+    "next": "Sonraki",
+    "previous": "Önceki"
+  },
+  "errors": {
+    "networkError": "Ağ hatası. İnternet bağlantınızı kontrol edin.",
+    "serverError": "Sunucu hatası. Lütfen daha sonra tekrar deneyin.",
+    "unauthorized": "Bu işlem için yetkiniz yok.",
+    "notFound": "Aradığınız içerik bulunamadı.",
+    "validationError": "Form bilgileri eksik veya hatalı.",
+    "unknownError": "Beklenmeyen bir hata oluştu."
+  },
+  "messages": {
+    "dataUpdated": "Veriler güncellendi",
+    "taskCreated": "Görev oluşturuldu",
+    "taskUpdated": "Görev güncellendi",
+    "taskDeleted": "Görev silindi",
+    "taskCompleted": "Görev tamamlandı",
+    "groupCreated": "Grup oluşturuldu",
+    "groupJoined": "Gruba katıldınız",
+    "profileUpdated": "Profil güncellendi",
+    "passwordChanged": "Şifre değiştirildi",
+    "settingsSaved": "Ayarlar kaydedildi"
+  }
+}

@@ -8,6 +8,11 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { StatusBar } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// i18n desteği
+import './src/i18n';
+import { useTranslation } from 'react-i18next';
 
 import { store, persistor } from './src/store';
 import { InitSplashScreen } from './src/screens/InitSplashScreen';

@@ -17,9 +17,11 @@ import {
   Avatar,
   Divider,
 } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { TaskStatus, TaskPriority } from '../types/task.types';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 interface DashboardScreenProps {
   navigation: any;
@@ -34,6 +36,7 @@ interface TaskSummary {
 }
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [refreshing, setRefreshing] = useState(false);
   const [taskSummary, setTaskSummary] = useState<TaskSummary>({
     total: 0,
@@ -115,19 +118,19 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
                 style={styles.avatar}
               />
               <View style={styles.welcomeText}>
-                <Title>Hoş geldin, {user?.firstName || 'Kullanıcı'}!</Title>
-                <Subheading>Bugün {taskSummary.pending} görevin var</Subheading>
+                <Title>{t('dashboard.welcome')}, {user?.firstName || t('common.user')}!</Title>
+                <Subheading>{t('dashboard.todaysTasks', { count: taskSummary.pending })}</Subheading>
               </View>
             </View>
           </Card.Content>
         </Card>
 
-        {/* Görev Özeti */}
+        {/* Task Summary */}
         <Card style={styles.summaryCard}>
           <Card.Content>
-            <Title>Görev Özeti</Title>
+            <Title>{t('dashboard.taskSummary')}</Title>
             <View style={styles.progressContainer}>
-              <Text>İlerleme: {Math.round(getProgressValue() * 100)}%</Text>
+              <Text>{t('dashboard.progress')}: {Math.round(getProgressValue() * 100)}%</Text>
               <ProgressBar
                 progress={getProgressValue()}
                 color="#6200EE"
