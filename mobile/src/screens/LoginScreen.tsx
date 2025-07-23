@@ -18,14 +18,17 @@ import {
   HelperText,
   Divider,
 } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { loginAsync } from '../store/slices/authSlice';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 interface LoginScreenProps {
   navigation: any;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -45,10 +48,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
     // Email validation
     if (!email.trim()) {
-      setEmailError('Email adresi gereklidir');
+      setEmailError(t('auth.validation.emailRequired'));
       isValid = false;
     } else if (!validateEmail(email)) {
-      setEmailError('Geçerli bir email adresi giriniz');
+      setEmailError(t('auth.validation.emailInvalid'));
       isValid = false;
     } else {
       setEmailError('');
@@ -56,10 +59,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
     // Password validation
     if (!password.trim()) {
-      setPasswordError('Şifre gereklidir');
+      setPasswordError(t('auth.validation.passwordRequired'));
       isValid = false;
     } else if (password.length < 6) {
-      setPasswordError('Şifre en az 6 karakter olmalıdır');
+      setPasswordError(t('auth.validation.passwordMinLength'));
       isValid = false;
     } else {
       setPasswordError('');
@@ -81,10 +84,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         navigation.replace('Main');
       } else {
         // Login başarısız, hata mesajını göster
-        Alert.alert('Giriş Hatası', result.payload as string);
+        Alert.alert(t('auth.errors.loginFailed'), result.payload as string);
       }
     } catch (error) {
-      Alert.alert('Hata', 'Beklenmeyen bir hata oluştu');
+      Alert.alert(t('common.error'), t('auth.errors.unknownError'));
     }
   };
 
@@ -109,8 +112,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           {/* Header */}
           <View style={styles.header}>
             <Avatar.Icon size={80} icon="home" style={styles.logo} />
-            <Title style={styles.title}>homeTeam</Title>
-            <Text style={styles.subtitle}>Aile Görev Takip Sistemi</Text>
+            <Title style={styles.title}>{t('app.name')}</Title>
+            <Text style={styles.subtitle}>{t('app.subtitle')}</Text>
+            
+            {/* Language Switcher */}
+            <LanguageSwitcher style={styles.languageSwitcher} />
           </View>
 
           {/* Login Form */}
@@ -118,7 +124,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             <Card.Content>
               <View style={styles.form}>
                 <TextInput
-                  label="Email"
+                  label={t('auth.emailLabel')}
                   value={email}
                   onChangeText={(text) => {
                     setEmail(text);
@@ -137,7 +143,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 </HelperText>
 
                 <TextInput
-                  label="Şifre"
+                  label={t('auth.passwordLabel')}
                   value={password}
                   onChangeText={(text) => {
                     setPassword(text);
@@ -173,7 +179,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   style={styles.loginButton}
                   contentStyle={styles.buttonContent}
                 >
-                  Giriş Yap
+                  {t('auth.loginButton')}
                 </Button>
 
                 <Button
@@ -181,7 +187,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   onPress={handleForgotPassword}
                   style={styles.forgotButton}
                 >
-                  Şifremi Unuttum
+                  {t('auth.forgotPasswordButton')}
                 </Button>
               </View>
             </Card.Content>
@@ -190,14 +196,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           {/* Register Section */}
           <View style={styles.registerSection}>
             <Divider style={styles.divider} />
-            <Text style={styles.registerText}>Hesabınız yok mu?</Text>
+            <Text style={styles.registerText}>{t('auth.dontHaveAccount')}</Text>
             <Button
               mode="outlined"
               onPress={handleRegister}
               style={styles.registerButton}
               contentStyle={styles.buttonContent}
             >
-              Hesap Oluştur
+              {t('auth.registerButton')}
             </Button>
           </View>
         </Surface>
@@ -275,6 +281,9 @@ const styles = StyleSheet.create({
   },
   registerButton: {
     minWidth: 200,
+  },
+  languageSwitcher: {
+    marginTop: 15,
   },
 });
 

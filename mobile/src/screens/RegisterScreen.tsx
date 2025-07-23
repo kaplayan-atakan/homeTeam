@@ -13,14 +13,17 @@ import {
   Text,
   Snackbar,
 } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { registerAsync } from '../store/slices/authSlice';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 interface RegisterScreenProps {
   navigation: any;
 }
 
 const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { isLoading, error } = useAppSelector((state) => state.auth);
 

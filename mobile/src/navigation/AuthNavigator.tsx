@@ -1,11 +1,12 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useTranslation } from 'react-i18next';
 
 // Auth screens
-import { LoginScreen } from '../screens/LoginScreen';
-import { RegisterScreen } from '../screens/RegisterScreen';
-import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -16,6 +17,8 @@ export type AuthStackParamList = {
 const Stack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
+  const { t } = useTranslation();
+  
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -29,25 +32,25 @@ const AuthNavigator: React.FC = () => {
           name="Login" 
           component={LoginScreen}
           options={{
-            title: 'Giriş Yap',
+            title: t('auth.loginTitle'),
           }}
         />
         <Stack.Screen 
           name="Register" 
           component={RegisterScreen}
           options={{
-            title: 'Kayıt Ol',
+            title: t('auth.registerTitle'),
             headerShown: true,
-            headerBackTitle: 'Geri',
+            headerBackTitle: t('common.back'),
           }}
         />
         <Stack.Screen 
           name="ForgotPassword" 
           component={ForgotPasswordScreen}
           options={{
-            title: 'Şifremi Unuttum',
+            title: t('auth.forgotPasswordTitle'),
             headerShown: true,
-            headerBackTitle: 'Geri',
+            headerBackTitle: t('common.back'),
           }}
         />
       </Stack.Navigator>
