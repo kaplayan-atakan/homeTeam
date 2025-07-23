@@ -29,7 +29,11 @@
     "settings": "Ayarlar",
     "profile": "Profil",
     "notifications": "Bildirimler",
-    "language": "Dil"
+    "language": "Dil",
+    "user": "Kullanıcı",
+    "pending": "Bekliyor",
+    "inProgress": "Devam Ediyor",
+    "completed": "Tamamlandı"
   },
   "app": {
     "name": "homeTeam",
@@ -87,12 +91,16 @@
   },
   "dashboard": {
     "welcome": "Hoşgeldin",
-    "todaysTasks": "Bugünkü Görevler",
+    "todaysTasks": "Bugün {{count}} görevin var",
     "upcomingTasks": "Yaklaşan Görevler",
     "completedTasks": "Tamamlanan Görevler",
     "overdueTasks": "Geciken Görevler",
     "myGroups": "Gruplarım",
     "recentActivity": "Son Aktiviteler",
+    "taskSummary": "Görev Özeti",
+    "recentTasks": "Son Görevler",
+    "progress": "İlerleme",
+    "newTask": "Yeni Görev",
     "stats": {
       "totalTasks": "Toplam Görev",
       "completedToday": "Bugün Tamamlanan",

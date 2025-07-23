@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 // Auth screens
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
 
 export type AuthStackParamList = {
   Login: undefined;

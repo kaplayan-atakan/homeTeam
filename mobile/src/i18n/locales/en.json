@@ -29,7 +29,11 @@
     "settings": "Settings",
     "profile": "Profile",
     "notifications": "Notifications",
-    "language": "Language"
+    "language": "Language",
+    "user": "User",
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "completed": "Completed"
   },
   "app": {
     "name": "homeTeam",
@@ -87,12 +91,16 @@
   },
   "dashboard": {
     "welcome": "Welcome",
-    "todaysTasks": "Today's Tasks",
+    "todaysTasks": "You have {{count}} tasks today",
     "upcomingTasks": "Upcoming Tasks",
     "completedTasks": "Completed Tasks",
     "overdueTasks": "Overdue Tasks",
     "myGroups": "My Groups",
     "recentActivity": "Recent Activity",
+    "taskSummary": "Task Summary",
+    "recentTasks": "Recent Tasks",
+    "progress": "Progress",
+    "newTask": "New Task",
     "stats": {
       "totalTasks": "Total Tasks",
       "completedToday": "Completed Today",
