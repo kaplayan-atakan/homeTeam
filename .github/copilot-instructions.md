@@ -15,6 +15,8 @@ Bu proje, aile ve grup bazlı görev takibi için geliştirilen bir React Native
 - **Gerçek Zamanlı İletişim**: WebSocket (Socket.IO)
 - **Müzik Entegrasyonu**: Spotify + YouTube API
 - **Container**: Docker + Docker Compose
+- **Cache Management**: Redis ile Session, API Response ve Rate Limiting
+- **Error Logging**: MongoDB tabanlı kapsamlı hata takibi
 
 ### Frontend (Mobile)
 - **Framework**: React Native + TypeScript
@@ -23,6 +25,15 @@ Bu proje, aile ve grup bazlı görev takibi için geliştirilen bir React Native
 - **UI Framework**: React Native Paper
 - **HTTP Client**: Axios
 - **WebSocket**: Socket.IO Client
+
+### Admin Dashboard (Web)
+- **Framework**: Next.js 14 + TypeScript
+- **UI Framework**: Tailwind CSS + Shadcn/ui
+- **State Management**: Zustand + React Query (TanStack Query)
+- **Charts & Analytics**: Recharts + Chart.js
+- **Authentication**: NextAuth.js ile Backend JWT entegrasyonu
+- **Real-time Updates**: Socket.IO Client
+- **HTTP Client**: Axios + React Query
 
 ## Kodlama Standartları
 
@@ -61,31 +72,84 @@ Bu proje, aile ve grup bazlı görev takibi için geliştirilen bir React Native
 6. **Gamification**: Puan sistemi ve başarı rozeti
 7. **Çoklu Grup Desteği**: Kullanıcı birden fazla gruba üye olabilir
 
-## Dosya ve Klasör Yapısı
+## Tek Repo Yapısı (TEK KAYNAK İLKESİ)
+
+⚠️ **ÖNEMLİ**: Bu proje TEK REPOSITORY stratejisini benimser. Tüm uygulamalar (backend, mobile, admin) tek repo'da geliştirilir.
+
+### Ana Klasör Yapısı
 
 ```
-backend/
-├── src/
-│   ├── modules/
-│   │   ├── auth/
-│   │   ├── users/
-│   │   ├── tasks/
-│   │   ├── groups/
-│   │   ├── notifications/
-│   │   └── music/
-│   ├── websocket/
-│   └── config/
-
-mobile/
-├── src/
-│   ├── components/
-│   ├── screens/
-│   ├── navigation/
-│   ├── store/
-│   ├── services/
-│   ├── types/
-│   └── utils/
+homeTeam/ (Ana Repository)
+├── backend/           # NestJS API Server
+│   ├── src/
+│   │   ├── modules/
+│   │   │   ├── auth/
+│   │   │   ├── users/
+│   │   │   ├── tasks/
+│   │   │   ├── groups/
+│   │   │   ├── notifications/
+│   │   │   ├── music/
+│   │   │   └── logs/
+│   │   ├── websocket/
+│   │   ├── config/
+│   │   ├── cache/
+│   │   └── common/
+│   ├── Dockerfile
+│   └── package.json
+├── mobile/            # React Native Uygulaması (TEK MOBİL APP)
+│   ├── src/
+│   │   ├── components/
+│   │   ├── screens/
+│   │   ├── navigation/
+│   │   ├── store/
+│   │   ├── services/
+│   │   ├── types/
+│   │   └── config/
+│   ├── android/
+│   ├── ios/
+│   └── package.json
+├── admin/             # Next.js Admin Dashboard
+│   ├── src/
+│   │   ├── app/ (Next.js 14 App Router)
+│   │   ├── components/
+│   │   │   ├── ui/ (Shadcn/ui components)
+│   │   │   ├── charts/
+│   │   │   ├── forms/
+│   │   │   └── layout/
+│   │   ├── lib/
+│   │   │   ├── api/
+│   │   │   ├── auth/
+│   │   │   ├── utils/
+│   │   │   └── validations/
+│   │   ├── store/
+│   │   ├── types/
+│   │   └── hooks/
+│   └── package.json
+├── docs/              # Shared Documentation
+│   ├── API_TEST_RESULTS.md
+│   ├── ARCHITECTURE.md
+│   ├── DEVELOPMENT-ROADMAP.md
+│   └── SYSTEM-STATUS.md
+├── docker/            # Docker Configurations
+│   ├── docker-compose.yml
+│   └── Dockerfile.*
+├── scripts/           # Build/Test Scripts
+│   ├── test-api.ps1
+│   ├── *.js (test scripts)
+│   └── *.json (test data)
+├── .github/           # GitHub Workflows & Instructions
+│   ├── copilot-instructions.md
+│   └── workflows/
+└── README.md          # Ana proje dokümantasyonu
 ```
+
+### Tek Repo Stratejisi Kuralları
+
+1. **Hiçbir zaman ayrı repo oluşturma**: Tüm geliştirmeler ana repo'da yapılır
+2. **Klasör bazlı organize**: Her uygulama kendi klasöründe, bağımsız package.json
+3. **Shared dependencies**: Ortak bağımlılıklar root package.json'da tanımlanabilir
+4. **Cross-platform koordinasyon**: Version'lar ve API değişiklikleri senkronize
+5. **Unified CI/CD**: Tek pipeline ile tüm uygulamalar deploy edilir
 
 ## Veritabanı Yapısı
 
@@ -172,3 +236,50 @@ DELETE /api/tasks/:id - Sil
 ```
 
 Bu talimatları takip ederek, tutarlı ve kaliteli kod üretmeye odaklan. Modüler mimari ve SOLID prensiplerini her zaman ön planda tut.
+
+## 🔒 Tek Repo Sürdürülebilirlik Kuralları
+
+### ❌ **YAPILMAMASI GEREKENLER**
+1. **Hiçbir zaman yeni repo oluşturma**
+   - Mobile için ayrı repo açma
+   - Backend/Frontend split repo stratejisi
+   - Feature bazlı repo ayırma
+
+2. **Klasör dışı development**
+   - Root seviyede development dosyası bırakma
+   - Geçici test dosyalarını organize etmeme
+   - Documentation'ı dağınık bırakma
+
+3. **Cross-platform bağımlılık kırma**
+   - API versioning koordinasyonu yapmama
+   - Mobile-Backend uyumsuzluğu yaratma
+   - Admin dashboard entegrasyonunu ihmal etme
+
+### ✅ **YAPILMASI GEREKENLER**
+1. **Organize klasör yapısını koruma**
+   ```
+   ├── backend/     # Tüm API geliştirmesi
+   ├── mobile/      # Tek mobil uygulama
+   ├── admin/       # Web dashboard
+   ├── docs/        # Tüm dokümantasyon
+   ├── docker/      # Container configs
+   └── scripts/     # Build/test scripts
+   ```
+
+2. **Version koordinasyonu**
+   - API değişikliklerinde mobile güncelleme
+   - Breaking changes için migration guide
+   - Semantic versioning kullanma
+
+3. **Shared development practices**
+   - TypeScript interfaces paylaşma
+   - Error handling consistency
+   - Documentation güncel tutma
+
+### 🚨 **ACİL MÜDAHALE KURALLARI**
+Eğer birisi yanlışlıkla:
+- Yeni repo oluşturmaya çalışırsa → Ana repo'ya yönlendir
+- Dosyaları dağıtırsa → Organize klasör yapısına geri koy
+- Cross-platform uyumsuzluk yaratırsa → API contract kontrolü yap
+
+Bu kurallar projinin sürdürülebilirliği için kritiktir!

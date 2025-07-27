@@ -29,7 +29,7 @@ export class GroupsController {
   @HttpCode(HttpStatus.CREATED)
   async createGroup(@Body() createGroupDto: CreateGroupDto, @Request() req) {
     try {
-      const group = await this.groupsService.create(createGroupDto, req.user.userId);
+      const group = await this.groupsService.create(createGroupDto, req.user.id);
       return {
         success: true,
         message: 'Grup başarıyla oluşturuldu',
@@ -47,7 +47,7 @@ export class GroupsController {
   @Get()
   async getUserGroups(@Request() req, @Query('page') page = 1, @Query('limit') limit = 10) {
     try {
-      const groups = await this.groupsService.getUserGroups(req.user.userId);
+      const groups = await this.groupsService.getUserGroups(req.user.id);
       return {
         success: true,
         message: 'Gruplar başarıyla listelendi',
@@ -87,7 +87,7 @@ export class GroupsController {
     @Request() req,
   ) {
     try {
-      const group = await this.groupsService.update(id, updateGroupDto, req.user.userId);
+      const group = await this.groupsService.update(id, updateGroupDto, req.user.id);
       return {
         success: true,
         message: 'Grup başarıyla güncellendi',
@@ -106,7 +106,7 @@ export class GroupsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteGroup(@Param('id') id: string, @Request() req) {
     try {
-      await this.groupsService.archiveGroup(id, { reason: 'Kullanıcı tarafından silindi' }, req.user.userId);
+      await this.groupsService.archiveGroup(id, { reason: 'Kullanıcı tarafından silindi' }, req.user.id);
       return {
         success: true,
         message: 'Grup başarıyla silindi',
@@ -128,7 +128,7 @@ export class GroupsController {
     @Request() req,
   ) {
     try {
-      const result = await this.groupsService.joinGroup(joinGroupDto, req.user.userId);
+      const result = await this.groupsService.joinGroup(joinGroupDto, req.user.id);
       return {
         success: true,
         message: 'Gruba başarıyla katıldınız',
@@ -147,7 +147,7 @@ export class GroupsController {
   @HttpCode(HttpStatus.OK)
   async leaveGroup(@Param('id') id: string, @Request() req) {
     try {
-      await this.groupsService.leaveGroup(id, {}, req.user.userId);
+      await this.groupsService.leaveGroup(id, {}, req.user.id);
       return {
         success: true,
         message: 'Gruptan başarıyla ayrıldınız',
@@ -173,7 +173,7 @@ export class GroupsController {
       const result = await this.groupsService.inviteMember(id, { 
         email: addMemberDto.userId, // Bu durumda email bekleniyor
         role: addMemberDto.role 
-      }, req.user.userId);
+      }, req.user.id);
       return {
         success: true,
         message: 'Üye başarıyla eklendi',
@@ -196,7 +196,7 @@ export class GroupsController {
     @Request() req,
   ) {
     try {
-      await this.groupsService.removeMember(id, { userId: memberId }, req.user.userId);
+      await this.groupsService.removeMember(id, { userId: memberId }, req.user.id);
       return {
         success: true,
         message: 'Üye başarıyla çıkarıldı',
@@ -219,7 +219,7 @@ export class GroupsController {
     @Request() req,
   ) {
     try {
-      const result = await this.groupsService.updateMemberRole(id, { userId: memberId, role }, req.user.userId);
+      const result = await this.groupsService.updateMemberRole(id, { userId: memberId, role }, req.user.id);
       return {
         success: true,
         message: 'Üye rolü başarıyla güncellendi',

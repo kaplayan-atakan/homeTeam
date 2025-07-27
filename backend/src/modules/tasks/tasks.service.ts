@@ -67,7 +67,7 @@ export class TasksService {
         createdBy: new Types.ObjectId(createdBy),
         assignedTo: createTaskDto.assignedTo 
           ? new Types.ObjectId(createTaskDto.assignedTo) 
-          : undefined,
+          : new Types.ObjectId(createdBy), // Default olarak oluşturana ata
         groupId: createTaskDto.groupId 
           ? new Types.ObjectId(createTaskDto.groupId) 
           : undefined,

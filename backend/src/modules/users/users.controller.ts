@@ -7,6 +7,7 @@ import {
   Param, 
   Delete,
   UseGuards,
+  UseInterceptors,
   Request,
   HttpCode,
   HttpStatus,
@@ -23,10 +24,15 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from './user.schema';
+import { CacheInterceptor } from '../../cache/interceptors/cache.interceptor';
+import { CacheInvalidateInterceptor } from '../../cache/interceptors/cache-invalidate.interceptor';
+import { CacheKey } from '../../cache/decorators/cache-key.decorator';
+import { CacheTTL } from '../../cache/decorators/cache-ttl.decorator';
 
 // SOLID: Single Responsibility Principle - Kullanıcı HTTP istekleri için tek sorumluluk
 @Controller('users')
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(CacheInterceptor, CacheInvalidateInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -46,6 +52,8 @@ export class UsersController {
   @Get()
   @Roles(UserRole.ADMIN)
   @UseGuards(RolesGuard)
+  @CacheKey('users:all')
+  @CacheTTL(600) // 10 dakika
   async findAll() {
     const users = await this.usersService.findAll();
     return {
@@ -56,6 +64,8 @@ export class UsersController {
 
   // Kendi profilini görüntüleme
   @Get('profile')
+  @CacheKey('users:profile:{userId}')
+  @CacheTTL(300) // 5 dakika
   async getProfile(@Request() req) {
     const user = await this.usersService.findById(req.user.id);
     return {
@@ -66,6 +76,8 @@ export class UsersController {
 
   // ID ile kullanıcı getirme
   @Get(':id')
+  @CacheKey('users:detail:{id}')
+  @CacheTTL(300) // 5 dakika
   async findOne(@Param('id') id: string) {
     const user = await this.usersService.findById(id);
     return {

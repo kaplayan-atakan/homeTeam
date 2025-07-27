@@ -1,0 +1,64 @@
+{
+  "name": "hometeam-monorepo",
+  "version": "1.0.0",
+  "description": "homeTeam - Aile Görev Yönetim Sistemi (Tek Repo)",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "mobile", 
+    "admin"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:mobile\" \"npm run dev:admin\"",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:mobile": "cd mobile && npm run start",
+    "dev:admin": "cd admin && npm run dev",
+    "build": "npm run build:backend && npm run build:admin",
+    "build:backend": "cd backend && npm run build",
+    "build:admin": "cd admin && npm run build",
+    "test": "npm run test:backend && npm run test:mobile && npm run test:admin",
+    "test:backend": "cd backend && npm run test",
+    "test:mobile": "cd mobile && npm run test",
+    "test:admin": "cd admin && npm run test",
+    "lint": "npm run lint:backend && npm run lint:mobile && npm run lint:admin",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:mobile": "cd mobile && npm run lint",
+    "lint:admin": "cd admin && npm run lint",
+    "docker:up": "cd docker && docker-compose up -d",
+    "docker:down": "cd docker && docker-compose down",
+    "docker:logs": "cd docker && docker-compose logs -f",
+    "api:test": "pwsh scripts/test-api.ps1",
+    "clean": "npm run clean:backend && npm run clean:mobile && npm run clean:admin",
+    "clean:backend": "cd backend && rm -rf node_modules dist",
+    "clean:mobile": "cd mobile && rm -rf node_modules",
+    "clean:admin": "cd admin && rm -rf node_modules .next",
+    "install:all": "npm install && npm run install:backend && npm run install:mobile && npm run install:admin",
+    "install:backend": "cd backend && npm install",
+    "install:mobile": "cd mobile && npm install",
+    "install:admin": "cd admin && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "family",
+    "task-management", 
+    "react-native",
+    "nestjs",
+    "nextjs",
+    "mongodb",
+    "redis",
+    "websocket",
+    "monorepo"
+  ],
+  "author": "Atakan Kaplayan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaplayan-atakan/homeTeam.git"
+  }
+}

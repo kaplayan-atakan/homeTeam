@@ -110,3 +110,37 @@ docker-compose.override.yml
 
 # Production config files
 docker-compose.prod.yml
+
+# React Native specific
+*.xcworkspace
+*.xcuserdata
+ios/Pods/
+android/.gradle/
+android/app/build/
+android/build/
+*.apk
+*.ipa
+
+# Metro bundler
+.metro-health-check*
+
+# Admin Dashboard
+admin/.next/
+admin/out/
+admin/dist/
+
+# Temporary files
+utputFormat
+temp-*
+output*
+
+# Test files (organized in scripts/)
+*.test.js
+test-*.json
+
+# Documentation build
+docs/build/
+
+# Scripts output
+scripts/output/
+scripts/logs/

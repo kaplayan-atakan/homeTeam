@@ -79,6 +79,7 @@ export class GroupsService {
 
       const group = new this.groupModel({
         ...createGroupDto,
+        type: createGroupDto.type || 'family', // Default type
         owner: ownerId,
         members: [ownerMember],
         activityLog: [{

@@ -69,16 +69,21 @@ describe('NotificationsService', () => {
         assignedBy: new Types.ObjectId().toString(),
       };
 
-      const result = await service.createTaskAssignedNotification(userId, taskData);
+      const result = await service.createTaskAssignedNotification(
+        userId, 
+        taskData.taskId, 
+        taskData.taskTitle, 
+        taskData.assignedBy
+      );
       
       expect(result).toBeDefined();
     });
   });
 
-  describe('getUserNotifications', () => {
+  describe('findUserNotifications', () => {
     it('should return user notifications', async () => {
       const userId = new Types.ObjectId().toString();
-      const result = await service.getUserNotifications(userId);
+      const result = await service.findUserNotifications(userId, { page: 1, limit: 10 });
       
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);

@@ -11,7 +11,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: homeTeam2025!
       MONGO_INITDB_DATABASE: hometeam
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongodb_data:/data/db
       - ./backend/mongo-init:/docker-entrypoint-initdb.d
@@ -24,7 +24,7 @@ services:
     container_name: hometeam-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     networks:

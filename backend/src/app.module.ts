@@ -9,7 +9,9 @@ import { GroupsModule } from './modules/groups/groups.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { MusicModule } from './modules/music/music.module';
+import { LogsModule } from './modules/logs/logs.module';
 import { WebsocketModule } from './websocket/websocket.module';
+import { CacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
@@ -28,6 +30,9 @@ import { WebsocketModule } from './websocket/websocket.module';
       inject: [ConfigService],
     }),
 
+    // Cache Management - Redis entegrasyonu
+    CacheModule,
+
     // İş mantığı modülleri - Modüler mimari
     AuthModule,
     UsersModule,
@@ -35,6 +40,7 @@ import { WebsocketModule } from './websocket/websocket.module';
     NotificationsModule,
     TasksModule,
     MusicModule,
+    LogsModule,
     WebsocketModule,
   ],
   controllers: [],

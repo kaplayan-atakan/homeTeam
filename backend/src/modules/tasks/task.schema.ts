@@ -51,7 +51,7 @@ export class Task {
   @Prop({ 
     type: Types.ObjectId, 
     ref: 'User', 
-    required: true 
+    required: false // Default olarak oluşturana atanır
   })
   assignedTo: Types.ObjectId;
 
@@ -79,7 +79,7 @@ export class Task {
   @Prop({ default: new Date() })
   startDate: Date;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: null })
   dueDate: Date;
 
   @Prop({ default: null })

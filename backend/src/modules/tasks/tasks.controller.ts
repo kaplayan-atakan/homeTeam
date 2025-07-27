@@ -40,7 +40,7 @@ export class TasksController {
   @HttpCode(HttpStatus.CREATED)
   async createTask(@Body() createTaskDto: CreateTaskDto, @Request() req) {
     try {
-      const task = await this.tasksService.create(createTaskDto, req.user.userId);
+      const task = await this.tasksService.create(createTaskDto, req.user.id);
       return {
         success: true,
         message: 'Görev başarıyla oluşturuldu',
@@ -58,7 +58,7 @@ export class TasksController {
   @Get()
   async getTasks(@Query() filterDto: TaskFilterDto, @Request() req) {
     try {
-      const result = await this.tasksService.findAll(filterDto, req.user.userId);
+      const result = await this.tasksService.findAll(filterDto, req.user.id);
       return {
         success: true,
         message: 'Görevler başarıyla listelendi',
@@ -98,7 +98,7 @@ export class TasksController {
     @Request() req,
   ) {
     try {
-      const task = await this.tasksService.update(id, updateTaskDto, req.user.userId);
+      const task = await this.tasksService.update(id, updateTaskDto, req.user.id);
       return {
         success: true,
         message: 'Görev başarıyla güncellendi',
@@ -117,7 +117,7 @@ export class TasksController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteTask(@Param('id') id: string, @Request() req) {
     try {
-      await this.tasksService.delete(id, req.user.userId);
+      await this.tasksService.delete(id, req.user.id);
       return {
         success: true,
         message: 'Görev başarıyla silindi',
@@ -139,7 +139,7 @@ export class TasksController {
     @Request() req,
   ) {
     try {
-      const task = await this.tasksService.complete(id, completeDto, req.user.userId);
+      const task = await this.tasksService.complete(id, completeDto, req.user.id);
       return {
         success: true,
         message: 'Görev başarıyla tamamlandı',
@@ -167,7 +167,7 @@ export class TasksController {
         {
           assignedTo: assignDto.assignedTo,
         },
-        req.user.userId,
+        req.user.id,
       );
       return {
         success: true,
@@ -191,7 +191,7 @@ export class TasksController {
     @Request() req,
   ) {
     try {
-      const task = await this.tasksService.addComment(id, commentDto, req.user.userId);
+      const task = await this.tasksService.addComment(id, commentDto, req.user.id);
       return {
         success: true,
         message: 'Yorum başarıyla eklendi',
@@ -210,7 +210,7 @@ export class TasksController {
   @HttpCode(HttpStatus.OK)
   async bulkUpdateTasks(@Body() bulkUpdateDto: BulkUpdateTasksDto, @Request() req) {
     try {
-      await this.tasksService.bulkUpdate(bulkUpdateDto, req.user.userId);
+      await this.tasksService.bulkUpdate(bulkUpdateDto, req.user.id);
       return {
         success: true,
         message: 'Görevler başarıyla güncellendi',
@@ -227,7 +227,7 @@ export class TasksController {
   @Get('stats/overview')
   async getTaskStats(@Query() statsDto: TaskStatsDto, @Request() req) {
     try {
-      const stats = await this.tasksService.getStats(statsDto, req.user.userId);
+      const stats = await this.tasksService.getStats(statsDto, req.user.id);
       return {
         success: true,
         message: 'Görev istatistikleri başarıyla getirildi',

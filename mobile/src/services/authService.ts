@@ -39,17 +39,31 @@ export interface User {
 class AuthService {
   private tokenKey = Config.STORAGE_KEYS.AUTH_TOKEN;
   private refreshTokenKey = Config.STORAGE_KEYS.REFRESH_TOKEN;
-  private userKey = Config.STORAGE_KEYS.USER;
+  private userKey = Config.STORAGE_KEYS.USER_DATA;
 
   // Login
   async login(credentials: LoginRequest): Promise<{ data: AuthResponse }> {
     const response = await apiClient.post('/auth/login', credentials);
     
     if (response.data.success) {
-      await this.storeAuthData(response.data.data);
+      // Backend'den gelen format: {user, accessToken}
+      const authData = {
+        user: {
+          id: response.data.data.user._id || response.data.data.user.id,
+          firstName: response.data.data.user.firstName,
+          lastName: response.data.data.user.lastName,
+          email: response.data.data.user.email,
+          profileImage: response.data.data.user.profileImage,
+        },
+        token: response.data.data.accessToken,
+        refreshToken: '', // Backend'de refresh token yok şimdilik
+      };
+      
+      await this.storeAuthData(authData);
+      return { data: authData };
     }
     
-    return response.data;
+    throw new Error(response.data.message || 'Giriş başarısız');
   }
 
   // Register

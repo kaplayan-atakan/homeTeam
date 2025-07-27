@@ -5,16 +5,16 @@ const Config = {
   // API Konfigürasyonu
   API_BASE_URL: __DEV__ 
     ? Platform.select({
-        ios: 'http://localhost:3000/api',
-        android: 'http://10.0.2.2:3000/api', // Android emulator için
+        ios: 'http://localhost:3001/api',
+        android: 'http://10.0.2.2:3001/api', // Android emulator için
       })
     : 'https://your-production-api.com/api',
 
   // WebSocket Konfigürasyonu  
   WEBSOCKET_URL: __DEV__
     ? Platform.select({
-        ios: 'ws://localhost:3000',
-        android: 'ws://10.0.2.2:3000',
+        ios: 'ws://localhost:3001',
+        android: 'ws://10.0.2.2:3001',
       })
     : 'wss://your-production-api.com',
 
