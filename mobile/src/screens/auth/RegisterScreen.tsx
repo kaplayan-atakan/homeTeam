@@ -14,10 +14,12 @@ import {
   Text,
   Card,
   Snackbar,
+  Divider,
 } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { registerAsync } from '../../store/slices/authSlice';
+import { registerAsync, googleLoginAsync } from '../../store/slices/authSlice';
 import { RootState, AppDispatch } from '../../store';
+import { googleSignInService, GoogleSigninButton } from '../../services/googleSignIn';
 
 interface RegisterScreenProps {
   navigation: any;
@@ -102,6 +104,28 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
 
   const navigateToLogin = () => {
     navigation.navigate('Login');
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const googleResponse = await googleSignInService.signIn();
+      
+      // Google'dan alınan idToken'ı backend'e gönder
+      const result = await dispatch(googleLoginAsync(googleResponse.idToken));
+      
+      if (googleLoginAsync.fulfilled.match(result)) {
+        Alert.alert(
+          'Başarılı',
+          'Google ile giriş yapıldı! Hoş geldiniz.',
+          [{ text: 'Tamam' }]
+        );
+      } else {
+        setSnackbarVisible(true);
+      }
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      Alert.alert('Google Giriş Hatası', error.message || 'Google ile giriş yapılamadı');
+    }
   };
 
   return (
@@ -208,6 +232,20 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
                 Hesap Oluştur
               </Button>
 
+              <View style={styles.dividerContainer}>
+                <Divider style={styles.divider} />
+                <Text style={styles.dividerText}>veya</Text>
+                <Divider style={styles.divider} />
+              </View>
+
+              <GoogleSigninButton
+                style={styles.googleButton}
+                size={GoogleSigninButton.Size.Wide}
+                color={GoogleSigninButton.Color.Dark}
+                onPress={handleGoogleLogin}
+                disabled={isLoading}
+              />
+
               <View style={styles.loginContainer}>
                 <Text style={styles.loginText}>
                   Zaten hesabınız var mı?{' '}
@@ -291,6 +329,24 @@ const styles = StyleSheet.create({
   },
   buttonContent: {
     paddingVertical: 8,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  divider: {
+    flex: 1,
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: 14,
+    color: '#666',
+  },
+  googleButton: {
+    width: '100%',
+    height: 50,
+    marginBottom: 16,
   },
   loginContainer: {
     flexDirection: 'row',

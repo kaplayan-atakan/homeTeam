@@ -59,7 +59,7 @@ export default function LoginPage() {
         email: string;
         firstName: string;
         lastName: string;
-        role: 'admin' | 'user';
+        role: 'admin' | 'member' | 'guest';
         groups?: string[];
         status?: string;
         lastLoginAt?: string;

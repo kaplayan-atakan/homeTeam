@@ -1,225 +1,121 @@
 import { apiClient } from './apiClient';
-import { ApiResponse, PaginatedResponse } from '../types/task.types';
-import { Task, CreateTaskDto, UpdateTaskDto, CompleteTaskDto } from '../types/task.types';
+import { TaskStatus, TaskPriority, Task } from '../types/task.types';
 
-export interface TaskFilters {
-  status?: string;
-  priority?: string;
-  assignedTo?: string;
-  groupId?: string;
-  startDate?: string;
-  endDate?: string;
-  tags?: string[];
+interface CreateTaskData {
+  title: string;
+  description: string;
+  groupId: string;
+  assignedTo: string;
+  dueDate: string;
+  priority: TaskPriority;
 }
 
-export interface TaskSortOptions {
-  field: 'dueDate' | 'priority' | 'created' | 'title' | 'status';
-  order: 'asc' | 'desc';
+interface UpdateTaskData {
+  title?: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  dueDate?: string;
 }
 
-export interface GetTasksParams {
-  page?: number;
-  limit?: number;
-  filters?: TaskFilters;
-  sort?: TaskSortOptions;
-  search?: string;
+interface TaskComment {
+  id: string;
+  taskId: string;
+  userId: string;
+  comment: string;
+  createdAt: string;
+}
+
+interface TaskStats {
+  total: number;
+  pending: number;
+  inProgress: number;
+  completed: number;
+  overdue: number;
 }
 
 export class TaskService {
-  private baseUrl = '/tasks';
-
-  // Görev listesi getir
-  async getTasks(params: GetTasksParams = {}): Promise<ApiResponse<PaginatedResponse<Task>>> {
-    const queryParams = new URLSearchParams();
-    
-    if (params.page) queryParams.append('page', params.page.toString());
-    if (params.limit) queryParams.append('limit', params.limit.toString());
-    if (params.search) queryParams.append('search', params.search);
-    
-    if (params.filters) {
-      Object.entries(params.filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          if (Array.isArray(value)) {
-            value.forEach(v => queryParams.append(`${key}[]`, v));
-          } else {
-            queryParams.append(key, value.toString());
-          }
-        }
-      });
-    }
-    
-    if (params.sort) {
-      queryParams.append('sortBy', params.sort.field);
-      queryParams.append('sortOrder', params.sort.order);
-    }
-
-    const response = await apiClient.get(`${this.baseUrl}?${queryParams.toString()}`);
-    return response.data;
+  // Task overview stats için backend endpoint
+  async getTaskStatsOverview(): Promise<TaskStats> {
+    return await apiClient.getData('/tasks/stats/overview');
   }
 
-  // Kullanıcının görevlerini getir
-  async getMyTasks(params: GetTasksParams = {}): Promise<ApiResponse<PaginatedResponse<Task>>> {
-    const queryParams = new URLSearchParams();
+  // Tüm görevleri getir (pagination ile)
+  async getTasks(page = 1, limit = 20, groupId?: string): Promise<{ tasks: Task[], total: number, page: number }> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      ...(groupId && { groupId })
+    });
     
-    if (params.page) queryParams.append('page', params.page.toString());
-    if (params.limit) queryParams.append('limit', params.limit.toString());
-    if (params.search) queryParams.append('search', params.search);
-    
-    if (params.filters) {
-      Object.entries(params.filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          if (Array.isArray(value)) {
-            value.forEach(v => queryParams.append(`${key}[]`, v));
-          } else {
-            queryParams.append(key, value.toString());
-          }
-        }
-      });
-    }
-
-    const response = await apiClient.get(`${this.baseUrl}/my-tasks?${queryParams.toString()}`);
-    return response.data;
+    return await apiClient.getData(`/tasks?${params.toString()}`);
   }
 
-  // Tekil görev getir
-  async getTaskById(taskId: string): Promise<ApiResponse<Task>> {
-    const response = await apiClient.get(`${this.baseUrl}/${taskId}`);
-    return response.data;
+  // Kullanıcının bekleyen görevleri
+  async getMyPendingTasks(): Promise<Task[]> {
+    return await apiClient.getData('/tasks/my/pending');
+  }
+
+  // Kullanıcının geciken görevleri
+  async getMyOverdueTasks(): Promise<Task[]> {
+    return await apiClient.getData('/tasks/my/overdue');
+  }
+
+  // Bugün tamamlanan görevler
+  async getMyCompletedTodayTasks(): Promise<Task[]> {
+    return await apiClient.getData('/tasks/my/completed/today');
+  }
+
+  // Tekil görev detayı
+  async getTaskById(taskId: string): Promise<Task> {
+    return await apiClient.getData(`/tasks/${taskId}`);
   }
 
   // Yeni görev oluştur
-  async createTask(taskData: CreateTaskDto): Promise<ApiResponse<Task>> {
-    const response = await apiClient.post(this.baseUrl, taskData);
-    return response.data;
+  async createTask(taskData: CreateTaskData): Promise<Task> {
+    return await apiClient.postData('/tasks', taskData);
   }
 
   // Görev güncelle
-  async updateTask(taskId: string, taskData: UpdateTaskDto): Promise<ApiResponse<Task>> {
-    const response = await apiClient.patch(`${this.baseUrl}/${taskId}`, taskData);
-    return response.data;
-  }
-
-  // Görev sil
-  async deleteTask(taskId: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.delete(`${this.baseUrl}/${taskId}`);
-    return response.data;
+  async updateTask(taskId: string, updateData: UpdateTaskData): Promise<Task> {
+    return await apiClient.putData(`/tasks/${taskId}`, updateData);
   }
 
   // Görev tamamla
-  async completeTask(taskId: string, completionData: CompleteTaskDto = {}): Promise<ApiResponse<Task>> {
-    const response = await apiClient.post(`${this.baseUrl}/${taskId}/complete`, completionData);
-    return response.data;
+  async completeTask(taskId: string): Promise<Task> {
+    return await apiClient.putData(`/tasks/${taskId}/complete`, {});
   }
 
-  // Görev başlat
-  async startTask(taskId: string): Promise<ApiResponse<Task>> {
-    const response = await apiClient.post(`${this.baseUrl}/${taskId}/start`);
-    return response.data;
+  // Görevi başlat
+  async startTask(taskId: string): Promise<Task> {
+    return await apiClient.putData(`/tasks/${taskId}/start`, {});
   }
 
-  // Görev duraklat
-  async pauseTask(taskId: string): Promise<ApiResponse<Task>> {
-    const response = await apiClient.post(`${this.baseUrl}/${taskId}/pause`);
-    return response.data;
+  // Görev sil
+  async deleteTask(taskId: string): Promise<void> {
+    return await apiClient.deleteData(`/tasks/${taskId}`);
   }
 
-  // Görev iptal et
-  async cancelTask(taskId: string, reason?: string): Promise<ApiResponse<Task>> {
-    const response = await apiClient.post(`${this.baseUrl}/${taskId}/cancel`, { reason });
-    return response.data;
+  // Görev yorumları
+  async getTaskComments(taskId: string): Promise<TaskComment[]> {
+    return await apiClient.getData(`/tasks/${taskId}/comments`);
   }
 
-  // Görevi yeniden aç
-  async reopenTask(taskId: string): Promise<ApiResponse<Task>> {
-    const response = await apiClient.post(`${this.baseUrl}/${taskId}/reopen`);
-    return response.data;
+  // Yorum ekle
+  async addTaskComment(taskId: string, comment: string): Promise<TaskComment> {
+    return await apiClient.postData(`/tasks/${taskId}/comments`, { comment });
   }
 
-  // Görev atama
-  async assignTask(taskId: string, assignedTo: string): Promise<ApiResponse<Task>> {
-    const response = await apiClient.post(`${this.baseUrl}/${taskId}/assign`, { assignedTo });
-    return response.data;
+  // Gruba göre görevleri getir
+  async getTasksByGroup(groupId: string): Promise<Task[]> {
+    return await apiClient.getData(`/groups/${groupId}/tasks`);
   }
 
-  // Görev atamasını kaldır
-  async unassignTask(taskId: string): Promise<ApiResponse<Task>> {
-    const response = await apiClient.post(`${this.baseUrl}/${taskId}/unassign`);
-    return response.data;
-  }
-
-  // Yorumu ekle
-  async addComment(taskId: string, content: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.post(`${this.baseUrl}/${taskId}/comments`, { content });
-    return response.data;
-  }
-
-  // Görev istatistikleri
-  async getTaskStats(groupId?: string): Promise<ApiResponse<any>> {
-    const url = groupId ? `${this.baseUrl}/stats?groupId=${groupId}` : `${this.baseUrl}/stats`;
-    const response = await apiClient.get(url);
-    return response.data;
-  }
-
-  // Geciken görevler
-  async getOverdueTasks(): Promise<ApiResponse<Task[]>> {
-    const response = await apiClient.get(`${this.baseUrl}/overdue`);
-    return response.data;
-  }
-
-  // Yaklaşan görevler
-  async getUpcomingTasks(days: number = 7): Promise<ApiResponse<Task[]>> {
-    const response = await apiClient.get(`${this.baseUrl}/upcoming?days=${days}`);
-    return response.data;
-  }
-
-  // Görev şablonu oluştur
-  async createTaskTemplate(taskData: CreateTaskDto): Promise<ApiResponse<any>> {
-    const response = await apiClient.post(`${this.baseUrl}/templates`, taskData);
-    return response.data;
-  }
-
-  // Şablondan görev oluştur
-  async createFromTemplate(templateId: string, overrides: Partial<CreateTaskDto> = {}): Promise<ApiResponse<Task>> {
-    const response = await apiClient.post(`${this.baseUrl}/templates/${templateId}/create`, overrides);
-    return response.data;
-  }
-
-  // Görev tekrarı oluştur
-  async createRecurringTask(taskData: CreateTaskDto & { recurrence: any }): Promise<ApiResponse<Task>> {
-    const response = await apiClient.post(`${this.baseUrl}/recurring`, taskData);
-    return response.data;
-  }
-
-  // Görev kopala
-  async duplicateTask(taskId: string, overrides: Partial<CreateTaskDto> = {}): Promise<ApiResponse<Task>> {
-    const response = await apiClient.post(`${this.baseUrl}/${taskId}/duplicate`, overrides);
-    return response.data;
-  }
-
-  // Toplu işlemler
-  async bulkUpdateTasks(taskIds: string[], updates: Partial<UpdateTaskDto>): Promise<ApiResponse<void>> {
-    const response = await apiClient.patch(`${this.baseUrl}/bulk`, { taskIds, updates });
-    return response.data;
-  }
-
-  async bulkDeleteTasks(taskIds: string[]): Promise<ApiResponse<void>> {
-    const response = await apiClient.delete(`${this.baseUrl}/bulk`, { data: { taskIds } });
-    return response.data;
-  }
-
-  // Export/Import
-  async exportTasks(groupId?: string, format: 'csv' | 'excel' | 'pdf' = 'csv'): Promise<Blob> {
-    const url = groupId 
-      ? `${this.baseUrl}/export?groupId=${groupId}&format=${format}`
-      : `${this.baseUrl}/export?format=${format}`;
-    const response = await apiClient.downloadFile(url);
-    return response.data;
-  }
-
-  async importTasks(file: FormData): Promise<ApiResponse<any>> {
-    const response = await apiClient.uploadFile(`${this.baseUrl}/import`, file);
-    return response.data;
+  // Kullanıcının tüm görevleri
+  async getMyTasks(): Promise<Task[]> {
+    return await apiClient.getData('/tasks/my');
   }
 }
 
+// Singleton instance export
 export const taskService = new TaskService();

@@ -1,67 +1,120 @@
 import { apiClient } from './apiClient';
-import { ApiResponse } from '../types/task.types';
-import { Group, CreateGroupDto, UpdateGroupDto } from '../types/group.types';
+import { Group, GroupRole } from '../types/group.types';
 
-export class GroupService {
-  async getUserGroups(): Promise<ApiResponse<Group[]>> {
-    const response = await apiClient.get('/groups/my-groups');
-    return response.data;
+interface CreateGroupData {
+  name: string;
+  description: string;
+  isPrivate?: boolean;
+}
+
+interface UpdateGroupData {
+  name?: string;
+  description?: string;
+  isPrivate?: boolean;
+}
+
+interface GroupMember {
+  id: string;
+  userId: string;
+  groupId: string;
+  role: GroupRole;
+  joinedAt: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+}
+
+interface GroupStats {
+  totalMembers: number;
+  activeTasks: number;
+  completedTasks: number;
+  overdueTasks: number;
+}
+
+class GroupService {
+  // Get user's groups
+  async getUserGroups() {
+    return await apiClient.getData('/groups/my');
   }
 
-  async getGroupById(groupId: string): Promise<ApiResponse<Group>> {
-    const response = await apiClient.get(`/groups/${groupId}`);
-    return response.data;
+  // Create new group
+  async createGroup(data: CreateGroupData) {
+    return await apiClient.postData('/groups', data);
   }
 
-  async createGroup(groupData: CreateGroupDto): Promise<ApiResponse<Group>> {
-    const response = await apiClient.post('/groups', groupData);
-    return response.data;
+  // Get group by ID
+  async getGroupById(groupId: string) {
+    return await apiClient.getData(`/groups/${groupId}`);
   }
 
-  async updateGroup(groupId: string, groupData: UpdateGroupDto): Promise<ApiResponse<Group>> {
-    const response = await apiClient.patch(`/groups/${groupId}`, groupData);
-    return response.data;
+  // Update group
+  async updateGroup(groupId: string, data: UpdateGroupData) {
+    return await apiClient.putData(`/groups/${groupId}`, data);
   }
 
-  async deleteGroup(groupId: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.delete(`/groups/${groupId}`);
-    return response.data;
+  // Delete group
+  async deleteGroup(groupId: string) {
+    return await apiClient.deleteData(`/groups/${groupId}`);
   }
 
-  async joinGroup(inviteCode: string): Promise<ApiResponse<Group>> {
-    const response = await apiClient.post('/groups/join', { inviteCode });
-    return response.data;
+  // Get group members
+  async getGroupMembers(groupId: string): Promise<GroupMember[]> {
+    return await apiClient.getData(`/groups/${groupId}/members`);
   }
 
-  async leaveGroup(groupId: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.post(`/groups/${groupId}/leave`);
-    return response.data;
+  // Add member to group
+  async addMember(groupId: string, userId: string, role: GroupRole = GroupRole.MEMBER) {
+    return await apiClient.postData(`/groups/${groupId}/members`, { userId, role });
   }
 
-  async inviteMember(groupId: string, email: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.post(`/groups/${groupId}/invite`, { email });
-    return response.data;
+  // Remove member from group
+  async removeMember(groupId: string, userId: string) {
+    return await apiClient.deleteData(`/groups/${groupId}/members/${userId}`);
   }
 
-  async removeMember(groupId: string, userId: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.delete(`/groups/${groupId}/members/${userId}`);
-    return response.data;
+  // Update member role
+  async updateMemberRole(groupId: string, userId: string, role: GroupRole) {
+    return await apiClient.putData(`/groups/${groupId}/members/${userId}`, { role });
   }
 
-  async updateMemberRole(groupId: string, userId: string, role: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.patch(`/groups/${groupId}/members/${userId}/role`, { role });
-    return response.data;
+  // Get group stats
+  async getGroupStats(groupId: string): Promise<GroupStats> {
+    return await apiClient.getData(`/groups/${groupId}/stats`);
   }
 
-  async generateInviteCode(groupId: string): Promise<ApiResponse<{ inviteCode: string }>> {
-    const response = await apiClient.post(`/groups/${groupId}/generate-invite`);
-    return response.data;
+  // Search groups
+  async searchGroups(query: string) {
+    return await apiClient.getData(`/groups/search?q=${encodeURIComponent(query)}`);
   }
 
-  async getGroupStats(groupId: string): Promise<ApiResponse<any>> {
-    const response = await apiClient.get(`/groups/${groupId}/stats`);
-    return response.data;
+  // Get public groups
+  async getPublicGroups() {
+    return await apiClient.getData('/groups/public');
+  }
+
+  // Join public group
+  async joinGroup(groupId: string) {
+    return await apiClient.postData(`/groups/${groupId}/join`);
+  }
+
+  // Leave group
+  async leaveGroup(groupId: string) {
+    return await apiClient.deleteData(`/groups/${groupId}/leave`);
+  }
+
+  // Get group tasks
+  async getGroupTasks(groupId: string) {
+    return await apiClient.getData(`/groups/${groupId}/tasks`);
+  }
+
+  // Get group activity/logs
+  async getGroupActivity(groupId: string) {
+    return await apiClient.getData(`/groups/${groupId}/activity`);
   }
 }
 
 export const groupService = new GroupService();
+export type { CreateGroupData, UpdateGroupData, GroupMember, GroupStats };

@@ -46,17 +46,18 @@ class AuthService {
     const response = await apiClient.post('/auth/login', credentials);
     
     if (response.data.success) {
-      // Backend'den gelen format: {user, accessToken}
+      // Backend'den gelen gerçek format: { success: true, data: { user, accessToken, refreshToken } }
+      const backendData = response.data.data;
       const authData = {
         user: {
-          id: response.data.data.user._id || response.data.data.user.id,
-          firstName: response.data.data.user.firstName,
-          lastName: response.data.data.user.lastName,
-          email: response.data.data.user.email,
-          profileImage: response.data.data.user.profileImage,
+          id: backendData.user._id || backendData.user.id,
+          firstName: backendData.user.firstName,
+          lastName: backendData.user.lastName,
+          email: backendData.user.email,
+          profileImage: backendData.user.profileImage,
         },
-        token: response.data.data.accessToken,
-        refreshToken: '', // Backend'de refresh token yok şimdilik
+        token: backendData.accessToken,
+        refreshToken: backendData.refreshToken || '',
       };
       
       await this.storeAuthData(authData);

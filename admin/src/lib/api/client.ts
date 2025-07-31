@@ -139,6 +139,8 @@ export const apiClient = new ApiClient();
 export const API_ENDPOINTS = {
   // Authentication
   LOGIN: '/auth/login',
+  PROFILE: '/auth/profile',
+  VERIFY_TOKEN: '/auth/verify-token',
   REFRESH: '/auth/refresh',
   LOGOUT: '/auth/logout',
   
@@ -152,17 +154,29 @@ export const API_ENDPOINTS = {
   
   // Tasks
   TASKS: '/tasks',
+  TASK_STATS: '/tasks/stats/overview',
+  MY_PENDING_TASKS: '/tasks/my/pending',
   USER_TASKS: '/tasks/user',
   GROUP_TASKS: '/tasks/group',
   
   // Notifications
   NOTIFICATIONS: '/notifications',
+  NOTIFICATION_STATS: '/notifications/stats',
   USER_NOTIFICATIONS: '/notifications/user',
   
   // Analytics & Stats
-  ANALYTICS: '/analytics',
-  STATS: '/analytics/stats',
+  ANALYTICS_DASHBOARD: '/analytics/dashboard',
+  ANALYTICS_STATS: '/analytics/stats',
+  ANALYTICS_USER_ACTIVITY: '/analytics/users/activity',
+  ANALYTICS_TASK_PERFORMANCE: '/analytics/tasks/performance',
+  ANALYTICS_GROUP_OVERVIEW: '/analytics/groups/overview',
+  
+  // Music
+  MUSIC_INTEGRATIONS: '/music/integrations',
+  MUSIC_STATS: '/music/stats',
   
   // Error Logs
-  ERROR_LOGS: '/logs/errors',
+  LOGS_RECENT: '/logs/recent',
+  LOGS_STATS: '/logs/stats',
+  LOGS_CATEGORIES: '/logs/categories',
 } as const;

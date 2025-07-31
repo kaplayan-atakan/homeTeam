@@ -3,8 +3,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 import Config from '../config/config';
 
+interface QueuedRequest {
+  url: string;
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  data?: any;
+  config?: AxiosRequestConfig;
+  resolve: (value: any) => void;
+  reject: (reason: any) => void;
+}
+
 class ApiClient {
   private instance: AxiosInstance;
+  private requestQueue: QueuedRequest[] = [];
+  private retryCount: number = 3;
+  private retryDelay: number = 1000;
 
   constructor() {
     this.instance = axios.create({
@@ -16,6 +28,39 @@ class ApiClient {
     });
 
     this.setupInterceptors();
+  }
+
+  private async retryRequest<T>(
+    requestFn: () => Promise<T>,
+    retries: number = this.retryCount
+  ): Promise<T> {
+    try {
+      return await requestFn();
+    } catch (error: any) {
+      if (retries > 0 && this.shouldRetry(error)) {
+        if (__DEV__) {
+          console.log(`🔄 Retrying request... (${this.retryCount - retries + 1}/${this.retryCount})`);
+        }
+        
+        await this.delay(this.retryDelay);
+        return this.retryRequest(requestFn, retries - 1);
+      }
+      throw error;
+    }
+  }
+
+  private shouldRetry(error: any): boolean {
+    // Network errors veya 5xx server errors için retry yap
+    return (
+      !error.response || 
+      error.code === 'NETWORK_ERROR' ||
+      error.code === 'ECONNABORTED' ||
+      (error.response?.status >= 500)
+    );
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   private setupInterceptors(): void {
@@ -157,13 +202,64 @@ class ApiClient {
     }
   }
 
-  // HTTP Methods
+  // HTTP Methods with Backend Response Wrapper Handling
   async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     return this.instance.get<T>(url, config);
   }
 
   async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     return this.instance.post<T>(url, data, config);
+  }
+
+  // Backend response wrapper'ını handle eden metodlar WITH RETRY LOGIC
+  async getData<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    return this.retryRequest(async () => {
+      const response = await this.instance.get(url, config);
+      return this.extractDataFromResponse<T>(response);
+    });
+  }
+
+  async postData<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.retryRequest(async () => {
+      const response = await this.instance.post(url, data, config);
+      return this.extractDataFromResponse<T>(response);
+    });
+  }
+
+  async putData<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.retryRequest(async () => {
+      const response = await this.instance.put(url, data, config);
+      return this.extractDataFromResponse<T>(response);
+    });
+  }
+
+  async patchData<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.retryRequest(async () => {
+      const response = await this.instance.patch(url, data, config);
+      return this.extractDataFromResponse<T>(response);
+    });
+  }
+
+  async deleteData<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    return this.retryRequest(async () => {
+      const response = await this.instance.delete(url, config);
+      return this.extractDataFromResponse<T>(response);
+    });
+  }
+
+  // Backend response wrapper'ından data'yı çıkar
+  private extractDataFromResponse<T>(response: AxiosResponse): T {
+    // Backend response format: { success: boolean, message: string, data: T }
+    if (response.data && typeof response.data === 'object' && 'success' in response.data) {
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        throw new Error(response.data.message || 'İşlem başarısız');
+      }
+    }
+    
+    // Fallback - raw response döndür
+    return response.data;
   }
 
   async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {

@@ -94,6 +94,18 @@ export const refreshTokenAsync = createAsyncThunk(
   }
 );
 
+export const googleLoginAsync = createAsyncThunk(
+  'auth/googleLogin',
+  async (googleToken: string, { rejectWithValue }) => {
+    try {
+      const response = await authService.loginWithGoogle(googleToken);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Google ile giriş yapılamadı');
+    }
+  }
+);
+
 // Auth slice
 const authSlice = createSlice({
   name: 'auth',
@@ -178,6 +190,25 @@ const authSlice = createSlice({
       .addCase(refreshTokenAsync.rejected, (state) => {
         state.user = null;
         state.token = null;
+        state.isAuthenticated = false;
+      });
+
+    // Google Login
+    builder
+      .addCase(googleLoginAsync.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(googleLoginAsync.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.error = null;
+      })
+      .addCase(googleLoginAsync.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
         state.isAuthenticated = false;
       });
   },

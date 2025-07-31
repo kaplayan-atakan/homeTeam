@@ -15,7 +15,7 @@ export interface UserSession {
   email: string;
   firstName: string;
   lastName: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'member' | 'guest';
   groups: string[];
   isActive: boolean;
   lastLoginAt: Date;
@@ -29,7 +29,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: 'admin' | 'user' | 'moderator';
+  role: 'admin' | 'member' | 'guest';
   isActive?: boolean;
   isEmailVerified?: boolean;
   groups?: string[];

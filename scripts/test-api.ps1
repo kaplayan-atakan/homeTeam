@@ -54,10 +54,8 @@ Write-Host "================================"
 # Auth Profile (authenticated endpoint)
 Test-Endpoint -Method "GET" -Endpoint "/auth/profile" -Description "Get admin profile" -RequireAuth $true
 
-# Auth Verify Token
-Test-Endpoint -Method "POST" -Endpoint "/auth/verify-token" -Description "Verify JWT token" -Data @{
-    token = $adminToken
-} -RequireAuth $false
+# Auth Verify Token (requires auth header)
+Test-Endpoint -Method "POST" -Endpoint "/auth/verify-token" -Description "Verify JWT token" -RequireAuth $true
 
 # 2. USERS ENDPOINTS TEST
 Write-Host "`n👥 USERS ENDPOINTS" -ForegroundColor Magenta
@@ -76,18 +74,19 @@ Write-Host "======================"
 # Get all groups
 Test-Endpoint -Method "GET" -Endpoint "/groups" -Description "Get all groups" -RequireAuth $true
 
-# Create a test group
+# Create a test group with unique name
+$timestamp = [int][double]::Parse((Get-Date -UFormat %s))
 $groupData = @{
-    name = "Test Group"
-    description = "API Test Group"
-    type = "project"
+    name = "API Test Group $timestamp"
+    description = "API Test Group Created at $(Get-Date)"
+    type = "team"
     settings = @{
         privacy = "private"
         memberLimit = 10
         allowInvites = $true
     }
 }
-$newGroup = Test-Endpoint -Method "POST" -Endpoint "/groups" -Description "Create test group" -Data $groupData -RequireAuth $true
+Test-Endpoint -Method "POST" -Endpoint "/groups" -Description "Create test group" -Data $groupData -RequireAuth $true
 
 # 4. TASKS ENDPOINTS TEST
 Write-Host "`n📋 TASKS ENDPOINTS" -ForegroundColor Magenta
@@ -110,7 +109,7 @@ $taskData = @{
     dueDate = (Get-Date).AddDays(7).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
     tags = @("test", "api")
 }
-$newTask = Test-Endpoint -Method "POST" -Endpoint "/tasks" -Description "Create test task" -Data $taskData -RequireAuth $true
+Test-Endpoint -Method "POST" -Endpoint "/tasks" -Description "Create test task" -Data $taskData -RequireAuth $true
 
 # 5. NOTIFICATIONS ENDPOINTS TEST
 Write-Host "`n🔔 NOTIFICATIONS ENDPOINTS" -ForegroundColor Magenta

@@ -43,50 +43,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { User } from '@/types';
-
-// Mock data - gerçek API çağrıları ile değiştirilecek
-const mockUsers: User[] = [
-  {
-    id: '1',
-    email: 'ahmet@email.com',
-    firstName: 'Ahmet',
-    lastName: 'Yılmaz',
-    role: 'admin',
-    isEmailVerified: true,
-    createdAt: new Date('2024-01-15T10:30:00Z'),
-    updatedAt: new Date('2024-01-15T10:30:00Z')
-  },
-  {
-    id: '2',
-    email: 'ayse@email.com',
-    firstName: 'Ayşe',
-    lastName: 'Demir',
-    role: 'user',
-    isEmailVerified: true,
-    createdAt: new Date('2024-01-10T14:20:00Z'),
-    updatedAt: new Date('2024-01-10T14:20:00Z')
-  },
-  {
-    id: '3',
-    email: 'mehmet@email.com',
-    firstName: 'Mehmet',
-    lastName: 'Kaya',
-    role: 'user',
-    isEmailVerified: false,
-    createdAt: new Date('2024-01-20T09:15:00Z'),
-    updatedAt: new Date('2024-01-20T09:15:00Z')
-  },
-  {
-    id: '4',
-    email: 'fatma@email.com',
-    firstName: 'Fatma',
-    lastName: 'Özkan',
-    role: 'moderator',
-    isEmailVerified: true,
-    createdAt: new Date('2024-01-05T16:45:00Z'),
-    updatedAt: new Date('2024-01-05T16:45:00Z')
-  }
-];
+import { apiClient } from '@/lib/api/client';
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -98,14 +55,13 @@ export default function UsersPage() {
   const queryClient = useQueryClient();
 
   // Kullanıcıları getir
-  const { data: users = [], isLoading, error } = useQuery({
+  const { data: users = [], isLoading, error } = useQuery<User[]>({
     queryKey: ['users'],
     queryFn: async () => {
-      // API çağrısı
-      // return await apiClient.get('/admin/users');
-      // Şimdilik mock data
-      return mockUsers;
-    }
+      // Real API çağrısı
+      return await apiClient.get<User[]>('/users');
+    },
+    retry: 3,
   });
 
   // Filtrelenmiş kullanıcılar
@@ -138,8 +94,8 @@ export default function UsersPage() {
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'admin': return 'bg-red-100 text-red-800';
-      case 'moderator': return 'bg-blue-100 text-blue-800';
-      case 'user': return 'bg-green-100 text-green-800';
+      case 'member': return 'bg-blue-100 text-blue-800';
+      case 'guest': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -148,7 +104,7 @@ export default function UsersPage() {
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'admin': return <ShieldCheck className="h-4 w-4" />;
-      case 'moderator': return <Shield className="h-4 w-4" />;
+      case 'member': return <Shield className="h-4 w-4" />;
       default: return <Users className="h-4 w-4" />;
     }
   };
@@ -227,8 +183,8 @@ export default function UsersPage() {
                     <SelectValue placeholder="Rol seçin" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="user">Kullanıcı</SelectItem>
-                    <SelectItem value="moderator">Moderatör</SelectItem>
+                    <SelectItem value="member">Üye</SelectItem>
+                    <SelectItem value="guest">Misafir</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
@@ -268,12 +224,12 @@ export default function UsersPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Moderatör</CardTitle>
+            <CardTitle className="text-sm font-medium">Üye</CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {users.filter(u => u.role === 'moderator').length}
+              {users.filter(u => u.role === 'member').length}
             </div>
           </CardContent>
         </Card>
@@ -317,8 +273,8 @@ export default function UsersPage() {
               <SelectContent>
                 <SelectItem value="all">Tüm Roller</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="moderator">Moderatör</SelectItem>
-                <SelectItem value="user">Kullanıcı</SelectItem>
+                <SelectItem value="member">Üye</SelectItem>
+                <SelectItem value="guest">Misafir</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -348,7 +304,7 @@ export default function UsersPage() {
                   <TableCell>
                     <Badge className={getRoleBadgeColor(user.role)}>
                       {user.role === 'admin' ? 'Admin' : 
-                       user.role === 'moderator' ? 'Moderatör' : 'Kullanıcı'}
+                       user.role === 'member' ? 'Üye' : 'Misafir'}
                     </Badge>
                   </TableCell>
                   <TableCell>

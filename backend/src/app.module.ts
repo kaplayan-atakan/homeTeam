@@ -10,6 +10,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { TasksModule } from './modules/tasks/tasks.module';
 import { MusicModule } from './modules/music/music.module';
 import { LogsModule } from './modules/logs/logs.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { WebsocketModule } from './websocket/websocket.module';
 import { CacheModule } from './cache/cache.module';
 
@@ -41,6 +42,7 @@ import { CacheModule } from './cache/cache.module';
     TasksModule,
     MusicModule,
     LogsModule,
+    AnalyticsModule,
     WebsocketModule,
   ],
   controllers: [],

@@ -27,11 +27,12 @@ export class User {
     required: true, 
     unique: true, 
     lowercase: true,
-    trim: true 
+    trim: true,
+    index: true  // ✅ Index eklendi
   })
   email: string;
 
-  @Prop({ required: false }) // OAuth kullanıcılar için şifre opsiyonel
+  @Prop({ required: false, select: false }) // ✅ Password'u default response'dan çıkar
   password?: string;
 
   @Prop({ 
@@ -108,6 +109,10 @@ export class User {
     groupMessages: boolean;
   };
 
+  // Refresh token field'ı eklendi
+  @Prop({ select: false })
+  refreshToken?: string;
+
   // Son giriş tarihi
   @Prop({ default: new Date() })
   lastLoginAt: Date;
@@ -118,3 +123,6 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+// ✅ MongoDB unique index oluştur
+UserSchema.index({ email: 1 }, { unique: true });

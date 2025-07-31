@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,29 +18,15 @@ import {
 import { apiClient } from '@/lib/api/client';
 import { DashboardStats } from '@/types';
 
-// Mock data for now - will be replaced with real API calls
-const mockStats: DashboardStats = {
-  totalUsers: 156,
-  totalGroups: 23,
-  totalTasks: 487,
-  completedTasks: 342,
-  pendingTasks: 98,
-  overdueTasks: 47,
-  activeUsers: 89,
-  taskCompletionRate: 70.2,
-};
-
 export default function DashboardPage() {
-  // This will be replaced with real API call
+  // Real API call for dashboard stats
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      // For now, return mock data
-      // In production: return apiClient.get<DashboardStats>('/analytics/dashboard');
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-      return mockStats;
+      return apiClient.get<DashboardStats>('/analytics/dashboard');
     },
     refetchInterval: 30000, // Refresh every 30 seconds
+    retry: 3,
   });
 
   if (isLoading) {

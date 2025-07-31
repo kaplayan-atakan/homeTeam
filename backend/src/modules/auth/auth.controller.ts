@@ -6,37 +6,48 @@ import {
   HttpStatus,
   UseGuards,
   Request,
-  Get 
+  Get,
+  UsePipes,
+  ValidationPipe,
+  HttpException,
+  BadRequestException,
+  UnauthorizedException,
+  InternalServerErrorException
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto, ForgotPasswordDto, ResetPasswordDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { GoogleAuthService } from './services/google-auth.service';
 
 // SOLID: Single Responsibility Principle - Kimlik doğrulama HTTP istekleri
 @Controller('auth')
+@UsePipes(new ValidationPipe({ 
+  whitelist: true,
+  forbidNonWhitelisted: true,
+  transform: true,
+  transformOptions: {
+    enableImplicitConversion: false
+  }
+}))
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly googleAuthService: GoogleAuthService,
+  ) {}
 
   // Kullanıcı kaydı
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() registerDto: RegisterDto) {
     try {
-      const result = await this.authService.register(registerDto);
-      
-      return {
-        success: true,
-        message: 'Hesap başarıyla oluşturuldu',
-        data: {
-          user: result.user,
-          accessToken: result.accessToken,
-        },
-      };
+      return await this.authService.register(registerDto);
     } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
+      // NestJS HttpException'lar (BadRequestException, ConflictException vb.) doğrudan throw edilsin
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      // Bilinmeyen hatalar için
+      throw new InternalServerErrorException('Kayıt işlemi başarısız');
     }
   }
 
@@ -45,32 +56,27 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto) {
     try {
-      const result = await this.authService.login(loginDto);
-      
-      return {
-        success: true,
-        message: 'Giriş başarılı',
-        data: {
-          user: result.user,
-          accessToken: result.accessToken,
-        },
-      };
+      return await this.authService.login(loginDto);
     } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
+      // NestJS HttpException'lar (UnauthorizedException, BadRequestException vb.) doğrudan throw edilsin
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      // Bilinmeyen hatalar için
+      throw new InternalServerErrorException('Giriş işlemi başarısız');
     }
   }
 
   // Profil bilgisi (token ile)
   @Get('profile')
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
   async getProfile(@Request() req) {
-    return {
-      success: true,
-      data: req.user,
-    };
+    try {
+      return await this.authService.getProfile(req.user.id);
+    } catch (error) {
+      throw new InternalServerErrorException('Profil bilgisi alınamadı');
+    }
   }
 
   // Token doğrulama
@@ -101,10 +107,7 @@ export class AuthController {
         },
       };
     } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
+      throw new UnauthorizedException('Token yenileme başarısız');
     }
   }
 
@@ -128,10 +131,10 @@ export class AuthController {
         },
       };
     } catch (error) {
-      return {
-        success: false,
-        message: 'E-posta gönderimi başarısız',
-      };
+      if (error.message.includes('Kullanıcı bulunamadı')) {
+        throw new BadRequestException('E-posta adresi bulunamadı');
+      }
+      throw new InternalServerErrorException('E-posta gönderimi başarısız');
     }
   }
 
@@ -150,10 +153,11 @@ export class AuthController {
         message: 'Şifre başarıyla sıfırlandı',
       };
     } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
+      if (error.message.includes('Token geçersiz') || 
+          error.message.includes('Token süresi dolmuş')) {
+        throw new BadRequestException(error.message);
+      }
+      throw new InternalServerErrorException('Şifre sıfırlama başarısız');
     }
   }
 
@@ -166,5 +170,69 @@ export class AuthController {
       success: true,
       message: 'Çıkış başarılı',
     };
+  }
+
+  // Google OAuth giriş
+  @Post('google')
+  @HttpCode(HttpStatus.OK)
+  async googleLogin(@Body() body: { token: string }) {
+    try {
+      // Google token'ı doğrula ve kullanıcı bilgilerini al
+      const googleUserData = await this.googleAuthService.verifyGoogleToken(body.token);
+      
+      const oauthData = {
+        email: googleUserData.email,
+        firstName: googleUserData.firstName,
+        lastName: googleUserData.lastName,
+        provider: 'google' as 'google',
+        providerId: googleUserData.providerId,
+      };
+
+      const result = await this.authService.oauthLogin(oauthData);
+
+      return {
+        success: true,
+        message: 'Google ile giriş başarılı',
+        data: result,
+      };
+    } catch (error) {
+      console.error('Google login error:', error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new BadRequestException('Google token doğrulanamadı');
+    }
+  }
+
+  // Facebook OAuth giriş
+  @Post('facebook')
+  @HttpCode(HttpStatus.OK)
+  async facebookLogin(@Body() body: { token: string }) {
+    try {
+      // Facebook token'ı doğrula ve kullanıcı bilgilerini al
+      // Bu örnekte frontend'den gelen user bilgilerini kullanacağız
+      
+      // Geçici olarak mock data kullanıyoruz
+      const mockFacebookUserData = {
+        email: 'user@facebook.com',
+        firstName: 'Facebook',
+        lastName: 'User',
+        provider: 'facebook' as 'facebook',
+        providerId: 'facebook_id_' + Date.now(),
+      };
+
+      const result = await this.authService.oauthLogin(mockFacebookUserData);
+
+      return {
+        success: true,
+        message: 'Facebook ile giriş başarılı',
+        data: result,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Facebook giriş işlemi başarısız');
+    }
   }
 }

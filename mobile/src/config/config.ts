@@ -47,8 +47,9 @@ const Config = {
 
   // Social Auth
   GOOGLE_AUTH: {
-    webClientId: 'your-google-web-client-id',
-    iosClientId: 'your-google-ios-client-id',
+    webClientId: 'your-google-web-client-id.apps.googleusercontent.com', // Google Cloud Console'dan alınacak
+    iosClientId: 'your-google-ios-client-id.apps.googleusercontent.com', // iOS için ayrı client ID
+    androidClientId: 'your-google-android-client-id.apps.googleusercontent.com', // Android için ayrı client ID
   },
 
   FACEBOOK_AUTH: {

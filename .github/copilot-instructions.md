@@ -283,3 +283,240 @@ Eğer birisi yanlışlıkla:
 - Cross-platform uyumsuzluk yaratırsa → API contract kontrolü yap
 
 Bu kurallar projinin sürdürülebilirliği için kritiktir!
+
+## 🚀 NPM Scripts Yönetimi ve Sürdürülebilirlik
+
+### 📋 **Standart NPM Scripts Listesi**
+
+Bu projede SADECE aşağıdaki standart script'ler kullanılmalıdır. Yeni script eklenmesi veya değiştirilmesi mutlaka bu listeye uygun olmalıdır.
+
+#### **🔧 Development Scripts**
+```bash
+npm run dev              # Tüm uygulamaları paralel başlatır (backend + mobile + admin)
+npm run dev:backend      # Sadece NestJS backend development server
+npm run dev:mobile       # Sadece React Native Metro bundler
+npm run dev:admin        # Sadece Next.js development server
+```
+
+#### **🏗️ Build Scripts**
+```bash
+npm run build            # Production build (backend + admin)
+npm run build:backend    # NestJS production build
+npm run build:admin      # Next.js production build
+```
+*Not: Mobile build ayrı Android/iOS toolchain gerektirdiğinden buraya dahil değil*
+
+#### **🧪 Test Scripts**
+```bash
+npm run test             # Tüm test suite'leri çalıştır
+npm run test:backend     # Backend unit/integration tests
+npm run test:mobile      # React Native tests (Jest)
+npm run test:admin       # Admin dashboard tests
+```
+
+#### **🔍 Code Quality Scripts**
+```bash
+npm run lint             # Tüm uygulamalarda lint kontrolü
+npm run lint:backend     # Backend ESLint kontrolü
+npm run lint:mobile      # Mobile ESLint kontrolü  
+npm run lint:admin       # Admin dashboard ESLint kontrolü
+```
+
+#### **🐳 Docker Scripts**
+```bash
+npm run docker:up        # Docker containers'ı başlat (MongoDB + Redis)
+npm run docker:down      # Docker containers'ı durdur
+npm run docker:logs      # Container loglarını izle
+```
+
+#### **🧹 Maintenance Scripts**
+```bash
+npm run clean            # Tüm node_modules ve build dosyalarını temizle
+npm run clean:backend    # Backend node_modules + dist temizle
+npm run clean:mobile     # Mobile node_modules temizle
+npm run clean:admin      # Admin node_modules + .next temizle
+```
+
+#### **📦 Installation Scripts**
+```bash
+npm run install:all      # Tüm uygulamalarda dependencies yükle
+npm run install:backend  # Backend dependencies
+npm run install:mobile   # Mobile dependencies
+npm run install:admin    # Admin dependencies
+```
+
+#### **🔧 Utility Scripts**
+```bash
+npm run api:test         # Backend API test suite (PowerShell)
+```
+
+### 🎯 **Script Eşleme Kuralları**
+
+Kullanıcı promptları aşağıdaki eşleme tablosuna göre script'lere dönüştürülmelidir:
+
+#### **Development Promptları → Scripts**
+```
+"backend'i çalıştır" → npm run dev:backend
+"mobile'ı başlat" → npm run dev:mobile  
+"admin'i aç" → npm run dev:admin
+"her şeyi başlat" → npm run dev
+"development server" → npm run dev
+"dev mode" → npm run dev
+```
+
+#### **Build Promptları → Scripts**
+```
+"production build" → npm run build
+"deploy için hazırla" → npm run build
+"backend build et" → npm run build:backend
+"admin build" → npm run build:admin
+```
+
+#### **Test Promptları → Scripts**
+```
+"testleri çalıştır" → npm run test
+"test et" → npm run test
+"backend testleri" → npm run test:backend
+"mobile testleri" → npm run test:mobile
+```
+
+#### **Docker Promptları → Scripts**
+```
+"database başlat" → npm run docker:up
+"MongoDB çalıştır" → npm run docker:up
+"Redis başlat" → npm run docker:up
+"container'ları durdur" → npm run docker:down
+"docker logları" → npm run docker:logs
+```
+
+#### **Maintenance Promptları → Scripts**
+```
+"temizle" → npm run clean
+"node_modules sil" → npm run clean
+"build dosyalarını sil" → npm run clean
+"dependencies yükle" → npm run install:all
+"lint kontrolü" → npm run lint
+"kod kalitesi" → npm run lint
+```
+
+#### **API Test Promptları → Scripts**
+```
+"API testleri" → npm run api:test
+"backend test et" → npm run api:test
+"endpoint testleri" → npm run api:test
+```
+
+### ⚠️ **YASAKLI EYLEMLER**
+
+#### **❌ Asla Yapılmaması Gerekenler**
+1. **Custom script oluşturma** - Sadece yukarıdaki standart scripts kullan
+2. **Script'leri doğrudan değiştirme** - Önce instruction'ları güncellenmelidir
+3. **Terminal'de manual komut çalıştırma** - Her zaman npm scripts kullan
+4. **Workspace dışına çıkma** - Sadece tanımlı klasörlerde çalış
+
+#### **✅ Doğru Yaklaşım**
+1. **Terminal Kontrolü (ÖNCELİK)** - Çalıştırma script'lerinden önce mutlaka aktif terminalleri kontrol et
+2. **Dosya Yolu Doğrulama (ZORUNLU)** - Her terminal komutundan önce doğru dizinde olduğunu garanti et
+3. **Prompt analizi** - Kullanıcı isteğini script eşleme tablosundan bul
+4. **Duplicate kontrolü** - Aynı process zaten çalışıyorsa kullanıcıyı bilgilendir
+5. **Script çalıştırma** - İlgili npm run komutunu kullan
+6. **Sonuç bildirme** - Hangi script'in çalıştırıldığını belirt
+7. **Hata durumunda** - Log'ları kontrol et ve standart script öner
+
+### 🔍 **Terminal Kontrol Süreci (ÖNCELİK!)**
+
+**Çalıştırma öncesi MUTLAKA bu kontrolleri yap:**
+
+#### **1. Dosya Yolu Doğrulama (ZORUNLU)**
+```powershell
+# Terminal komutundan önce MUTLAKA doğru dizine git
+cd "c:\Users\atakan.kaplayan\homeTeam"        # Root directory
+cd "c:\Users\atakan.kaplayan\homeTeam\backend" # Backend işlemleri için
+cd "c:\Users\atakan.kaplayan\homeTeam\mobile"  # Mobile işlemleri için
+cd "c:\Users\atakan.kaplayan\homeTeam\admin"   # Admin işlemleri için
+cd "c:\Users\atakan.kaplayan\homeTeam\scripts" # Test script'leri için
+```
+
+**📍 Dosya Yolu Güvenlik Kuralları:**
+- ❌ ASLA current directory'ye güvenme
+- ✅ Her komuttan önce mutlaka `cd` ile doğru dizine git
+- ✅ Absolute path kullan: `c:\Users\atakan.kaplayan\homeTeam\...`
+- ✅ İşlem türüne göre doğru klasöre yönlen:
+  ```
+  npm run dev:backend  → cd backend/
+  npm run dev:mobile   → cd mobile/
+  npm run dev:admin    → cd admin/
+  npm run api:test     → cd scripts/
+  ```
+
+#### **2. Aktif Terminal Kontrolü**
+```bash
+# Önce aktif terminalleri kontrol et
+get_terminal_output # Her açık terminal için
+```
+
+#### **2. Process Çakışma Kontrolü**
+Development script'lerinden önce kontrol edilmesi gerekenler:
+
+| Script | Çakışma Riski | Kontrol Edilecek |
+|--------|---------------|------------------|
+| `npm run dev` | ⚠️ YÜKSEK | Tüm port'lar (3000, 8081, 3001) |
+| `npm run dev:backend` | ⚠️ ORTA | Port 3000, database connection |
+| `npm run dev:mobile` | ⚠️ ORTA | Port 8081, Metro bundler |
+| `npm run dev:admin` | ⚠️ ORTA | Port 3001, Next.js dev server |
+| `npm run docker:up` | ⚠️ DÜŞÜK | Port 27018, 6380 |
+
+#### **3. Duplicate Process Bildirimi**
+Eğer aynı process zaten çalışıyorsa:
+```
+⚠️ UYARI: [Script Adı] zaten çalışıyor!
+📍 Terminal ID: [terminal_id]
+🔧 Öneri: Mevcut process'i kullan veya önce durdur
+```
+
+#### **4. Port Çakışması Çözümü**
+```bash
+# Port 8081 örneği (React Native Metro)
+npx react-native start --port 8082  # Alternatif port kullan
+```
+
+### 📝 **Script Kullanım Örnekleri**
+
+#### **Örnek 1: Terminal Kontrolü ile Development**
+```bash
+# Kullanıcı: "Backend'i çalıştır"
+# 1. Önce terminal kontrolü
+get_terminal_output  # Aktif terminalleri kontrol et
+# 2. Port 3000 kontrolü - eğer boşsa:
+cd "c:\Users\atakan.kaplayan\homeTeam\backend"  # Doğru dizine git
+npm run dev:backend  # ✅ Doğru
+```
+
+#### **Örnek 2: Duplicate Process Tespiti**
+```bash
+# Kullanıcı: "Mobile uygulamayı başlat"
+# 1. Terminal kontrolü sonucu: Port 8081 zaten kullanımda
+# 2. Kullanıcıya bildir:
+⚠️ UYARI: React Native Metro zaten çalışıyor!
+📍 Terminal ID: [id]
+🔧 Öneri: Mevcut Metro'yu kullan
+```
+
+#### **Örnek 3: Production Ready**
+```bash
+# Kullanıcı: "Deploy için hazırla"
+cd "c:\Users\atakan.kaplayan\homeTeam"  # Root dizine git
+npm run build  # ✅ Build işlemi çakışma riski düşük
+```
+
+#### **Örnek 4: Docker Terminal Kontrolü**
+```bash
+# Kullanıcı: "Database'i başlat"
+# 1. Önce kontrol et
+get_terminal_output  # MongoDB/Redis kontrol
+# 2. Eğer çalışmıyorsa:
+cd "c:\Users\atakan.kaplayan\homeTeam"  # Root dizine git
+npm run docker:up  # ✅ Doğru
+```
+
+Bu script yönetim sistemi projinin standardizasyonunu ve sürdürülebilirliğini garanti eder!

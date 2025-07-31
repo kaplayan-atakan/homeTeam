@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -17,9 +17,15 @@ import {
   Avatar,
   Divider,
 } from 'react-native-paper';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
-import { TaskStatus, TaskPriority } from '../types/task.types';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { TaskStatus, TaskPriority, Task } from '../types/task.types';
+import { 
+  fetchTaskStatsAsync,
+  fetchMyPendingTasksAsync,
+  fetchMyOverdueTasksAsync,
+  fetchMyCompletedTodayTasksAsync 
+} from '../store/slices/tasksSlice';
+import { fetchUserGroupsAsync } from '../store/slices/groupsSlice';
 
 interface DashboardScreenProps {
   navigation: any;
@@ -35,209 +41,266 @@ interface TaskSummary {
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
-  const [taskSummary, setTaskSummary] = useState<TaskSummary>({
-    total: 0,
-    pending: 0,
-    inProgress: 0,
-    completed: 0,
-    overdue: 0,
-  });
+  const dispatch = useAppDispatch();
 
-  const { user } = useSelector((state: RootState) => state.auth);
-  const { tasks } = useSelector((state: RootState) => state.tasks);
-  const { groups } = useSelector((state: RootState) => state.groups);
+  // Redux state'den veri çek
+  const { user } = useAppSelector((state) => state.auth);
+  const { 
+    taskStats,
+    pendingTasks,
+    overdueTasks,
+    completedTasks,
+    isLoading 
+  } = useAppSelector((state) => state.tasks);
+  const { groups } = useAppSelector((state) => state.groups);
+
+  // Recent tasks - pending ve overdue'dan al
+  const recentTasks = [...pendingTasks, ...overdueTasks].slice(0, 5);
+
+  // REAL API DATA FETCHING with Redux - NO MORE MOCK DATA!
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      // Paralel olarak tüm verileri Redux actions ile çek
+      await Promise.all([
+        dispatch(fetchTaskStatsAsync()),
+        dispatch(fetchMyPendingTasksAsync()),
+        dispatch(fetchMyOverdueTasksAsync()),
+        dispatch(fetchMyCompletedTodayTasksAsync()),
+        dispatch(fetchUserGroupsAsync())
+      ]);
+    } catch (error) {
+      console.error('Dashboard data fetch error:', error);
+      Alert.alert('Hata', 'Dashboard verileri yüklenirken bir hata oluştu');
+    }
+  }, [dispatch]);
 
   useEffect(() => {
-    calculateTaskSummary();
-  }, [tasks]);
-
-  const calculateTaskSummary = () => {
-    const summary = {
-      total: tasks.length,
-      pending: tasks.filter(task => task.status === TaskStatus.PENDING).length,
-      inProgress: tasks.filter(task => task.status === TaskStatus.IN_PROGRESS).length,
-      completed: tasks.filter(task => task.status === TaskStatus.COMPLETED).length,
-      overdue: tasks.filter(task => task.status === TaskStatus.OVERDUE).length,
-    };
-    setTaskSummary(summary);
-  };
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    try {
-      // API çağrıları burada yapılacak
-      // await dispatch(fetchTasks());
-      // await dispatch(fetchGroups());
-    } catch (error) {
-      Alert.alert('Hata', 'Veriler yüklenirken bir hata oluştu');
-    } finally {
-      setRefreshing(false);
-    }
+    await fetchDashboardData();
+    setRefreshing(false);
   };
 
-  const getProgressValue = () => {
-    if (taskSummary.total === 0) return 0;
-    return taskSummary.completed / taskSummary.total;
+  const renderTaskCard = (task: Task) => {
+    const getPriorityColor = (priority: TaskPriority): string => {
+      switch (priority) {
+        case TaskPriority.HIGH:
+          return '#F44336';
+        case TaskPriority.MEDIUM:
+          return '#FF9800';
+        case TaskPriority.LOW:
+          return '#4CAF50';
+        default:
+          return '#2196F3';
+      }
+    };
+
+    const getStatusColor = (status: TaskStatus): string => {
+      switch (status) {
+        case TaskStatus.PENDING:
+          return '#FFC107';
+        case TaskStatus.IN_PROGRESS:
+          return '#2196F3';
+        case TaskStatus.COMPLETED:
+          return '#4CAF50';
+        case TaskStatus.OVERDUE:
+          return '#F44336';
+        default:
+          return '#9E9E9E';
+      }
+    };
+
+    return (
+      <Card key={task.id} style={styles.taskCard}>
+        <Card.Content>
+          <View style={styles.taskHeader}>
+            <Text style={styles.taskTitle}>{task.title}</Text>
+            <Chip
+              mode="outlined"
+              style={[
+                styles.priorityChip,
+                { borderColor: getPriorityColor(task.priority) },
+              ]}
+              textStyle={{ color: getPriorityColor(task.priority) }}
+            >
+              {task.priority}
+            </Chip>
+          </View>
+          <Text style={styles.taskDescription}>{task.description}</Text>
+          <View style={styles.taskFooter}>
+            <Chip
+              mode="flat"
+              style={[
+                styles.statusChip,
+                { backgroundColor: getStatusColor(task.status) },
+              ]}
+              textStyle={{ color: 'white' }}
+            >
+              {task.status}
+            </Chip>
+            <Text style={styles.taskDate}>
+              {new Date(task.dueDate).toLocaleDateString('tr-TR')}
+            </Text>
+          </View>
+        </Card.Content>
+      </Card>
+    );
   };
 
-  const getPriorityColor = (priority: TaskPriority) => {
-    switch (priority) {
-      case TaskPriority.URGENT:
-        return '#F44336';
-      case TaskPriority.HIGH:
-        return '#FF9800';
-      case TaskPriority.MEDIUM:
-        return '#2196F3';
-      case TaskPriority.LOW:
-        return '#4CAF50';
-      default:
-        return '#9E9E9E';
-    }
-  };
-
-  const recentTasks = tasks.slice(0, 5); // Son 5 görev
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Dashboard yükleniyor...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <ScrollView
-        style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        showsVerticalScrollIndicator={false}
       >
-        {/* Hoş Geldin Kartı */}
-        <Card style={styles.welcomeCard}>
+        <View style={styles.header}>
+          <Title style={styles.welcomeText}>
+            Hoş geldin, {user?.firstName || 'Kullanıcı'}!
+          </Title>
+          <Subheading style={styles.dateText}>
+            {new Date().toLocaleDateString('tr-TR', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </Subheading>
+        </View>
+
+        {/* Task Summary Cards */}
+        <View style={styles.statsContainer}>
+          <Card style={[styles.statCard, { backgroundColor: '#E3F2FD' }]}>
+            <Card.Content style={styles.statContent}>
+              <Text style={styles.statNumber}>{taskStats.total}</Text>
+              <Text style={styles.statLabel}>Toplam Görev</Text>
+            </Card.Content>
+          </Card>
+
+          <Card style={[styles.statCard, { backgroundColor: '#FFF3E0' }]}>
+            <Card.Content style={styles.statContent}>
+              <Text style={styles.statNumber}>{taskStats.pending}</Text>
+              <Text style={styles.statLabel}>Bekleyen</Text>
+            </Card.Content>
+          </Card>
+
+          <Card style={[styles.statCard, { backgroundColor: '#E8F5E8' }]}>
+            <Card.Content style={styles.statContent}>
+              <Text style={styles.statNumber}>{taskStats.completed}</Text>
+              <Text style={styles.statLabel}>Tamamlanan</Text>
+            </Card.Content>
+          </Card>
+
+          <Card style={[styles.statCard, { backgroundColor: '#FFEBEE' }]}>
+            <Card.Content style={styles.statContent}>
+              <Text style={styles.statNumber}>{taskStats.overdue}</Text>
+              <Text style={styles.statLabel}>Geciken</Text>
+            </Card.Content>
+          </Card>
+        </View>
+
+        {/* Progress Bar */}
+        <Card style={styles.progressCard}>
           <Card.Content>
-            <View style={styles.welcomeContent}>
-              <Avatar.Text
-                size={50}
-                label={user?.firstName?.charAt(0) || 'U'}
-                style={styles.avatar}
-              />
-              <View style={styles.welcomeText}>
-                <Title>Hoş geldin, {user?.firstName || 'Kullanıcı'}!</Title>
-                <Subheading>Bugün {taskSummary.pending} görevin var</Subheading>
-              </View>
-            </View>
+            <Text style={styles.progressTitle}>Genel İlerleme</Text>
+            <ProgressBar
+              progress={
+                taskStats.total > 0
+                  ? taskStats.completed / taskStats.total
+                  : 0
+              }
+              style={styles.progressBar}
+              color="#4CAF50"
+            />
+            <Text style={styles.progressText}>
+              {taskStats.total > 0
+                ? Math.round((taskStats.completed / taskStats.total) * 100)
+                : 0}
+              % tamamlandı
+            </Text>
           </Card.Content>
         </Card>
 
-        {/* Görev Özeti */}
-        <Card style={styles.summaryCard}>
+        {/* Recent Tasks */}
+        <Card style={styles.sectionCard}>
           <Card.Content>
-            <Title>Görev Özeti</Title>
-            <View style={styles.progressContainer}>
-              <Text>İlerleme: {Math.round(getProgressValue() * 100)}%</Text>
-              <ProgressBar
-                progress={getProgressValue()}
-                color="#6200EE"
-                style={styles.progressBar}
-              />
+            <View style={styles.sectionHeader}>
+              <Title style={styles.sectionTitle}>Son Görevler</Title>
+              <Text
+                style={styles.seeAllText}
+                onPress={() => navigation.navigate('Tasks')}
+              >
+                Tümünü Gör
+              </Text>
             </View>
-            
-            <View style={styles.chipContainer}>
-              <Chip
-                icon="clock-outline"
-                textStyle={styles.chipText}
-                style={[styles.chip, { backgroundColor: '#FFF3E0' }]}
-              >
-                Bekliyor: {taskSummary.pending}
-              </Chip>
-              <Chip
-                icon="play-circle-outline"
-                textStyle={styles.chipText}
-                style={[styles.chip, { backgroundColor: '#E3F2FD' }]}
-              >
-                Devam: {taskSummary.inProgress}
-              </Chip>
-              <Chip
-                icon="check-circle-outline"
-                textStyle={styles.chipText}
-                style={[styles.chip, { backgroundColor: '#E8F5E8' }]}
-              >
-                Tamamlandı: {taskSummary.completed}
-              </Chip>
-              <Chip
-                icon="alert-circle-outline"
-                textStyle={styles.chipText}
-                style={[styles.chip, { backgroundColor: '#FFEBEE' }]}
-              >
-                Geciken: {taskSummary.overdue}
-              </Chip>
-            </View>
-          </Card.Content>
-        </Card>
-
-        {/* Son Görevler */}
-        <Card style={styles.recentTasksCard}>
-          <Card.Content>
-            <Title>Son Görevler</Title>
+            <Divider style={styles.divider} />
             {recentTasks.length > 0 ? (
-              recentTasks.map((task, index) => (
-                <React.Fragment key={task.id}>
-                  <View style={styles.taskItem}>
-                    <View style={styles.taskHeader}>
-                      <Text style={styles.taskTitle}>{task.title}</Text>
-                      <Chip
-                        style={[
-                          styles.priorityChip,
-                          { backgroundColor: getPriorityColor(task.priority) }
-                        ]}
-                        textStyle={styles.priorityChipText}
-                        compact
-                      >
-                        {task.priority}
-                      </Chip>
-                    </View>
-                    <Text style={styles.taskDescription} numberOfLines={2}>
-                      {task.description}
-                    </Text>
-                    <View style={styles.taskFooter}>
-                      <Text style={styles.taskStatus}>{task.status}</Text>
-                      <Text style={styles.taskDate}>
-                        {new Date(task.dueDate).toLocaleDateString('tr-TR')}
-                      </Text>
-                    </View>
-                  </View>
-                  {index < recentTasks.length - 1 && <Divider style={styles.divider} />}
-                </React.Fragment>
-              ))
+              recentTasks.map(renderTaskCard)
             ) : (
               <Text style={styles.emptyText}>Henüz görev bulunmuyor</Text>
             )}
           </Card.Content>
         </Card>
 
-        {/* Gruplar */}
-        <Card style={styles.groupsCard}>
+        {/* User Groups */}
+        <Card style={styles.sectionCard}>
           <Card.Content>
-            <Title>Gruplarım</Title>
+            <View style={styles.sectionHeader}>
+              <Title style={styles.sectionTitle}>Gruplarım</Title>
+              <Text
+                style={styles.seeAllText}
+                onPress={() => navigation.navigate('Groups')}
+              >
+                Tümünü Gör
+              </Text>
+            </View>
+            <Divider style={styles.divider} />
             {groups.length > 0 ? (
               <View style={styles.groupsContainer}>
-                {groups.slice(0, 3).map((group) => (
-                  <Chip
-                    key={group.id}
-                    avatar={<Avatar.Text size={24} label={group.name.charAt(0)} />}
-                    style={styles.groupChip}
-                    onPress={() => navigation.navigate('GroupDetail', { groupId: group.id })}
-                  >
-                    {group.name}
-                  </Chip>
+                {groups.slice(0, 3).map((group: any) => (
+                  <Card key={group.id} style={styles.groupCard}>
+                    <Card.Content style={styles.groupContent}>
+                      <Avatar.Text
+                        size={40}
+                        label={group.name.charAt(0)}
+                        style={styles.groupAvatar}
+                      />
+                      <View style={styles.groupInfo}>
+                        <Text style={styles.groupName}>{group.name}</Text>
+                        <Text style={styles.groupMembers}>
+                          {group.memberCount} üye
+                        </Text>
+                      </View>
+                    </Card.Content>
+                  </Card>
                 ))}
               </View>
             ) : (
-              <Text style={styles.emptyText}>Henüz gruba dahil değilsiniz</Text>
+              <Text style={styles.emptyText}>Henüz grup bulunmuyor</Text>
             )}
           </Card.Content>
         </Card>
+
+        <View style={styles.spacer} />
       </ScrollView>
 
-      {/* Yeni Görev Oluştur FAB */}
       <FAB
         style={styles.fab}
         icon="plus"
-        onPress={() => navigation.navigate('CreateTask')}
         label="Yeni Görev"
+        onPress={() => navigation.navigate('CreateTask')}
       />
     </View>
   );
@@ -248,116 +311,183 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
-  scrollView: {
+  loadingContainer: {
     flex: 1,
-    padding: 16,
-  },
-  welcomeCard: {
-    marginBottom: 16,
-    elevation: 4,
-  },
-  welcomeContent: {
-    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#F5F5F5',
   },
-  avatar: {
-    marginRight: 16,
+  header: {
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+    marginBottom: 10,
   },
   welcomeText: {
-    flex: 1,
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1976D2',
   },
-  summaryCard: {
-    marginBottom: 16,
-    elevation: 4,
+  dateText: {
+    fontSize: 16,
+    color: '#666666',
+    marginTop: 5,
   },
-  progressContainer: {
-    marginVertical: 16,
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  statCard: {
+    width: '22%',
+    elevation: 2,
+  },
+  statContent: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  statNumber: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1976D2',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#666666',
+    textAlign: 'center',
+    marginTop: 5,
+  },
+  progressCard: {
+    marginHorizontal: 10,
+    marginBottom: 15,
+    elevation: 2,
+  },
+  progressTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333333',
   },
   progressBar: {
     height: 8,
     borderRadius: 4,
+    backgroundColor: '#E0E0E0',
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#666666',
     marginTop: 8,
+    textAlign: 'center',
   },
-  chipContainer: {
+  sectionCard: {
+    marginHorizontal: 10,
+    marginBottom: 15,
+    elevation: 2,
+  },
+  sectionHeader: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  chip: {
-    marginBottom: 8,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333333',
   },
-  chipText: {
-    fontSize: 12,
+  seeAllText: {
+    fontSize: 14,
+    color: '#1976D2',
+    fontWeight: '500',
   },
-  recentTasksCard: {
-    marginBottom: 16,
-    elevation: 4,
+  divider: {
+    marginBottom: 15,
+    backgroundColor: '#E0E0E0',
   },
-  taskItem: {
-    paddingVertical: 8,
+  emptyText: {
+    fontSize: 14,
+    color: '#999999',
+    textAlign: 'center',
+    paddingVertical: 20,
+    fontStyle: 'italic',
+  },
+  taskCard: {
+    marginBottom: 10,
+    elevation: 1,
+    backgroundColor: '#FFFFFF',
   },
   taskHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
   taskTitle: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#333333',
     flex: 1,
-    marginRight: 8,
+    marginRight: 10,
   },
   priorityChip: {
     height: 24,
   },
-  priorityChipText: {
-    fontSize: 10,
-    color: 'white',
-  },
   taskDescription: {
-    color: '#666',
-    marginBottom: 8,
+    fontSize: 14,
+    color: '#666666',
+    marginBottom: 10,
+    lineHeight: 20,
   },
   taskFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  taskStatus: {
-    fontSize: 12,
-    color: '#999',
+  statusChip: {
+    height: 24,
   },
   taskDate: {
     fontSize: 12,
-    color: '#999',
-  },
-  divider: {
-    marginVertical: 8,
-  },
-  groupsCard: {
-    marginBottom: 80,
-    elevation: 4,
+    color: '#999999',
   },
   groupsContainer: {
+    gap: 10,
+  },
+  groupCard: {
+    elevation: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  groupContent: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    alignItems: 'center',
+    paddingVertical: 8,
   },
-  groupChip: {
-    marginBottom: 8,
+  groupAvatar: {
+    backgroundColor: '#1976D2',
+    marginRight: 15,
   },
-  emptyText: {
-    textAlign: 'center',
-    color: '#999',
-    fontStyle: 'italic',
-    marginTop: 8,
+  groupInfo: {
+    flex: 1,
+  },
+  groupName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginBottom: 2,
+  },
+  groupMembers: {
+    fontSize: 12,
+    color: '#666666',
+  },
+  spacer: {
+    height: 80,
   },
   fab: {
     position: 'absolute',
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: '#6200EE',
+    backgroundColor: '#1976D2',
   },
 });
 
