@@ -6,7 +6,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { GroupsModule } from './modules/groups/groups.module';
-import { NotificationsModule } from './modules/notifications/notifications.module';
+import { NotificationModule } from './modules/notifications/notification.module';
+import { TestModule } from './modules/test/test.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { MusicModule } from './modules/music/music.module';
 import { LogsModule } from './modules/logs/logs.module';
@@ -38,7 +39,8 @@ import { CacheModule } from './cache/cache.module';
     AuthModule,
     UsersModule,
     GroupsModule,
-    NotificationsModule,
+    NotificationModule,
+    TestModule,
     TasksModule,
     MusicModule,
     LogsModule,

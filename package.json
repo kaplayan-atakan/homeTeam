@@ -38,7 +38,10 @@
     "install:all": "npm install && npm run install:backend && npm run install:mobile && npm run install:admin",
     "install:backend": "cd backend && npm install",
     "install:mobile": "cd mobile && npm install",
-    "install:admin": "cd admin && npm install"
+    "install:admin": "cd admin && npm install",
+    "mobile:setup": "node scripts/mobile-test-setup.js",
+    "mobile:android": "node scripts/mobile-test-setup.js android",
+    "mobile:ios": "node scripts/mobile-test-setup.js ios"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

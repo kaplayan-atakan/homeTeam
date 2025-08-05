@@ -13,11 +13,26 @@ import { store, persistor } from './src/store';
 import { InitSplashScreen } from './src/screens/InitSplashScreen';
 import RootNavigator from './src/navigation/RootNavigator';
 import AuthNavigator from './src/navigation/AuthNavigator';
+import { firebaseNotificationService } from './src/services/firebaseNotificationService';
 
 // App wrapper component
 const AppContent: React.FC = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Firebase notifications başlatma
+  useEffect(() => {
+    const initializeFirebase = async () => {
+      try {
+        await firebaseNotificationService.initialize();
+        console.log('Firebase notifications initialized successfully');
+      } catch (error) {
+        console.error('Firebase notifications initialization failed:', error);
+      }
+    };
+
+    initializeFirebase();
+  }, []);
 
   const handleInitialization = (authenticated: boolean) => {
     setIsAuthenticated(authenticated);

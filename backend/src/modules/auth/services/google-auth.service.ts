@@ -6,9 +6,13 @@ export class GoogleAuthService {
   private client: OAuth2Client;
 
   constructor() {
-    this.client = new OAuth2Client(
-      process.env.GOOGLE_CLIENT_ID || 'your-google-client-id.apps.googleusercontent.com'
-    );
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    
+    if (googleClientId && googleClientId !== 'your-google-client-id') {
+      this.client = new OAuth2Client(googleClientId);
+    } else {
+      console.warn('Google Client ID not configured. Google authentication will be disabled.');
+    }
   }
 
   async verifyGoogleToken(token: string): Promise<{
@@ -18,6 +22,10 @@ export class GoogleAuthService {
     providerId: string;
   }> {
     try {
+      if (!this.client) {
+        throw new Error('Google authentication is not configured');
+      }
+
       const ticket = await this.client.verifyIdToken({
         idToken: token,
         audience: [
