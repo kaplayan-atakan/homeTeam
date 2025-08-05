@@ -138,7 +138,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    // React Native dependencies with proper versions
+    // React Native core dependency - using react-android instead of react-native
     implementation("com.facebook.react:react-android:0.72.7")
 
     // Firebase BOM ile versiyonları sync
@@ -156,17 +156,20 @@ dependencies {
         implementation jscFlavor
     }
 
-    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
-        exclude group:"com.facebook.fbjni"
-    }
+    // Flipper debug dependencies (conditional)
+    if (project.hasProperty("FLIPPER_VERSION")) {
+        debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
+            exclude group:"com.facebook.fbjni"
+        }
 
-    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
-        exclude group:"com.facebook.flipper"
-        exclude group:"com.squareup.okhttp3", module:"okhttp"
-    }
+        debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
+            exclude group:"com.facebook.flipper"
+            exclude group:"com.squareup.okhttp3", module:"okhttp"
+        }
 
-    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}") {
-        exclude group:"com.facebook.flipper"
+        debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}") {
+            exclude group:"com.facebook.flipper"
+        }
     }
 }
 
