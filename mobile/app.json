@@ -1,6 +1,19 @@
 {
-  "name": "homeTeamMobile",
-  "displayName": "homeTeam",
-  "version": "1.0.0",
-  "private": true
+  "expo": {
+    "name": "homeTeam",
+    "slug": "hometeam",
+    "version": "2.0.0",
+    "sdkVersion": "53.0.0",
+    "jsEngine": "hermes",
+    "platforms": ["android"],
+    "orientation": "portrait",
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "android": {
+      "package": "com.hometeam.app",
+      "versionCode": 1
+    },
+    "extra": {}
+  }
 }

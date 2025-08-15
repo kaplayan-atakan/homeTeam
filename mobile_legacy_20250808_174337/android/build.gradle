@@ -1,0 +1,79 @@
+buildscript {
+    ext {
+        buildToolsVersion = "34.0.0"
+        minSdkVersion = 21
+        compileSdkVersion = 34
+        targetSdkVersion = 34
+        ndkVersion = "25.1.8937393"
+        kotlinVersion = "1.8.10"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.0.1")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath 'com.google.gms:google-services:4.4.0'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://www.jitpack.io' }
+        // React Native and related dependencies are resolved from npm
+        maven {
+            url("$rootDir/../node_modules/@react-native/gradle-plugin/dist/packages/gradle-plugin/android")
+        }
+        maven {
+            url("$rootDir/../node_modules/react-native/android")
+        }
+        // Hermes artifacts
+        maven {
+            url("$rootDir/../node_modules/react-native/ReactAndroid")
+        }
+    }
+    
+    configurations.all {
+        resolutionStrategy {
+            // Force React Native version consistency
+            force 'com.facebook.react:react-android:0.72.7'
+            force 'com.facebook.react:hermes-android:0.72.7'
+            // Support for Firebase modules
+            eachDependency { DependencyResolveDetails details ->
+                if (details.requested.group == 'com.facebook.react' && details.requested.name == 'react-native') {
+                    details.useTarget group: 'com.facebook.react', name: 'react-android', version: '0.72.7'
+                }
+            }
+        }
+    }
+}
+
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                compileSdkVersion 34
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_1_8
+                    targetCompatibility JavaVersion.VERSION_1_8
+                }
+            }
+        }
+        
+        // Force all tasks to use Java 1.8 target
+        project.tasks.withType(JavaCompile).configureEach {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+        }
+        
+        // Configure Kotlin tasks to use JVM target 1.8
+        project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            kotlinOptions {
+                jvmTarget = '1.8'
+            }
+        }
+    }
+}

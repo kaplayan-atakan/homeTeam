@@ -1,0 +1,9 @@
+{
+  "react-native": {
+    "android_app_id": "1:your-project-id:android:your-android-app-id",
+    "ios_app_id": "1:your-project-id:ios:your-ios-app-id",
+    "current_key": "AIzaSyB-your-api-key-here",
+    "project_id": "your-project-id",
+    "storage_bucket": "your-project-id.appspot.com"
+  }
+}
