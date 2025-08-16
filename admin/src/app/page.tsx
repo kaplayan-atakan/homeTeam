@@ -13,13 +13,13 @@ import { Button } from "@/components/ui/button";
 import { BarChart3, Users, CheckSquare, Bell } from "lucide-react";
 export default function HomePage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, tokens } = useAuthStore();
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && tokens?.accessToken) {
       router.push("/dashboard");
     }
-  }, [isAuthenticated, router]);
-  if (isAuthenticated) {
+  }, [isAuthenticated, tokens, router]);
+  if (isAuthenticated && tokens?.accessToken) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         {" "}

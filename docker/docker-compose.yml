@@ -14,7 +14,7 @@ services:
       - "27018:27017"
     volumes:
       - mongodb_data:/data/db
-      - ./backend/mongo-init:/docker-entrypoint-initdb.d
+      - ../backend/mongo-init:/docker-entrypoint-initdb.d
     networks:
       - hometeam-network
 
@@ -33,7 +33,7 @@ services:
   # Backend API
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
     container_name: hometeam-backend
     restart: unless-stopped
@@ -50,7 +50,7 @@ services:
       - mongodb
       - redis
     volumes:
-      - ./backend:/app
+      - ../backend:/app
       - /app/node_modules
     networks:
       - hometeam-network

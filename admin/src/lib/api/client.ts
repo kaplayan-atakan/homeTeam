@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { useAuthStore } from '@/store/auth.store';
 
 // API Base Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -20,6 +21,9 @@ class ApiClient {
   }
 
   private setupInterceptors() {
+  // Simple guard to avoid multiple rapid redirects on repeated 401s during HMR
+  let lastRedirectAt = 0;
+
     // Request Interceptor - Add auth token
     this.client.interceptors.request.use(
       (config) => {
@@ -44,20 +48,42 @@ class ApiClient {
 
         // Handle 401 Unauthorized
         if (error.response?.status === 401 && !originalRequest._retry) {
+          // Don't try to refresh for auth endpoints to avoid loops
+          const reqUrl: string = originalRequest?.url || '';
+          const isAuthEndpoint = reqUrl.includes('/auth/');
           originalRequest._retry = true;
-          
+
           try {
-            await this.refreshToken();
-            const token = this.getAuthToken();
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return this.client(originalRequest);
-          } catch (refreshError) {
-            // Redirect to login
-            if (typeof window !== 'undefined') {
+            if (!isAuthEndpoint) {
+              await this.refreshToken();
+              const token = this.getAuthToken();
+              if (token) {
+                originalRequest.headers = originalRequest.headers || {};
+                originalRequest.headers.Authorization = `Bearer ${token}`;
+                return this.client(originalRequest);
+              }
+            }
+          } catch {
+            // fallthrough to logout & redirect below
+          }
+
+          // Clear state/tokens and redirect to login once
+          if (typeof window !== 'undefined') {
+            try {
+              // Reset Zustand auth state (also clears tokens from localStorage)
+              useAuthStore.getState().logout();
+            } catch {}
+            // Avoid thrashing: only redirect if not already on login and not too frequent
+            const now = Date.now();
+            if (
+              !window.location.pathname.startsWith('/login') &&
+              now - lastRedirectAt > 1000
+            ) {
+              lastRedirectAt = now;
               window.location.href = '/login';
             }
-            return Promise.reject(refreshError);
           }
+          return Promise.reject(error);
         }
 
         return Promise.reject(error);

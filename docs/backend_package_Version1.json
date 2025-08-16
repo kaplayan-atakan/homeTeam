@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "deps:analyze": "madge --extensions ts ./src --circular",
+    "deps:graph": "madge --extensions ts ./src --image dependency-graph.svg",
+    "deps:circular": "madge --extensions ts ./src --circular --warning"
+  },
+  "devDependencies": {
+    "madge": "^6.1.0"
+  }
+}

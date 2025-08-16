@@ -1,18 +1,18 @@
 buildscript {
     ext {
-        buildToolsVersion = "34.0.0"
-        minSdkVersion = 21
-        compileSdkVersion = 34
-        targetSdkVersion = 34
-        ndkVersion = "25.1.8937393"
-        kotlinVersion = "1.8.22"
+    buildToolsVersion = "34.0.0"
+    minSdkVersion = 21
+    compileSdkVersion = 34
+    targetSdkVersion = 34
+    ndkVersion = "25.1.8937393"
+    kotlinVersion = "1.9.22"
     }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.0.1")
+        classpath("com.android.tools.build:gradle:8.1.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         classpath("com.facebook.react:react-native-gradle-plugin")
     }
@@ -36,19 +36,7 @@ allprojects {
         }
     }
     
-    configurations.all {
-        resolutionStrategy {
-            // Force React Native version consistency
-            force 'com.facebook.react:react-android:0.72.7'
-            force 'com.facebook.react:hermes-android:0.72.7'
-            // Support for Firebase modules
-            eachDependency { DependencyResolveDetails details ->
-                if (details.requested.group == 'com.facebook.react' && details.requested.name == 'react-native') {
-                    details.useTarget group: 'com.facebook.react', name: 'react-android', version: '0.72.7'
-                }
-            }
-        }
-    }
+    // No forced pinning; allow RN 0.73.x to resolve proper artifacts
 }
 
 subprojects {
@@ -57,22 +45,22 @@ subprojects {
             project.android {
                 compileSdkVersion 34
                 compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_1_8
-                    targetCompatibility JavaVersion.VERSION_1_8
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
                 }
             }
         }
         
-        // Force all tasks to use Java 1.8 target
+        // Force all tasks to use Java 17 target
         project.tasks.withType(JavaCompile).configureEach {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
         }
         
-        // Configure Kotlin tasks to use JVM target 1.8
+        // Configure Kotlin tasks to use JVM target 17
         project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
             kotlinOptions {
-                jvmTarget = '1.8'
+                jvmTarget = '17'
             }
         }
     }

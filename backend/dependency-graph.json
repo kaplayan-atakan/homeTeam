@@ -1,0 +1,307 @@
+{
+  "app.module.ts": [
+    "cache/cache.module.ts",
+    "modules/analytics/analytics.module.ts",
+    "modules/auth/auth.module.ts",
+    "modules/groups/groups.module.ts",
+    "modules/logs/logs.module.ts",
+    "modules/music/music.module.ts",
+    "modules/notifications/notification.module.ts",
+    "modules/tasks/tasks.module.ts",
+    "modules/test/test.module.ts",
+    "modules/users/users.module.ts",
+    "websocket/websocket.module.ts"
+  ],
+  "cache/cache.module.ts": [
+    "cache/cache.service.ts",
+    "cache/interceptors/cache-invalidate.interceptor.ts",
+    "cache/interceptors/cache.interceptor.ts",
+    "cache/strategies/api-cache.strategy.ts",
+    "cache/strategies/rate-limit.strategy.ts",
+    "cache/strategies/session-cache.strategy.ts"
+  ],
+  "cache/cache.service.ts": [],
+  "cache/decorators/cache-key.decorator.ts": [],
+  "cache/decorators/cache-ttl.decorator.ts": [],
+  "cache/interceptors/cache-invalidate.interceptor.ts": [
+    "cache/strategies/api-cache.strategy.ts"
+  ],
+  "cache/interceptors/cache.interceptor.ts": [
+    "cache/decorators/cache-key.decorator.ts",
+    "cache/decorators/cache-ttl.decorator.ts",
+    "cache/strategies/api-cache.strategy.ts"
+  ],
+  "cache/strategies/api-cache.strategy.ts": [
+    "cache/cache.service.ts"
+  ],
+  "cache/strategies/rate-limit.strategy.ts": [
+    "cache/cache.service.ts"
+  ],
+  "cache/strategies/session-cache.strategy.ts": [
+    "cache/cache.service.ts"
+  ],
+  "common/filters/global-exception.filter.ts": [
+    "modules/logs/error-log.schema.ts",
+    "modules/logs/error-logging.service.ts"
+  ],
+  "config/config.interface.ts": [],
+  "config/configuration.service.ts": [
+    "config/config.interface.ts"
+  ],
+  "config/firebase.service.ts": [],
+  "controllers/test.controller.ts": [
+    "config/firebase.service.ts",
+    "modules/notifications/notification.service.ts",
+    "modules/notifications/schemas/notification.schema.ts"
+  ],
+  "main.ts": [
+    "app.module.ts",
+    "common/filters/global-exception.filter.ts",
+    "modules/logs/error-logging.service.ts"
+  ],
+  "modules/analytics/analytics.controller.ts": [
+    "modules/analytics/analytics.service.ts",
+    "modules/auth/decorators/roles.decorator.ts",
+    "modules/auth/guards/jwt-auth.guard.ts",
+    "modules/auth/guards/roles.guard.ts",
+    "modules/users/user.schema.ts"
+  ],
+  "modules/analytics/analytics.module.ts": [
+    "modules/analytics/analytics.controller.ts",
+    "modules/analytics/analytics.service.ts",
+    "modules/groups/group.schema.ts",
+    "modules/tasks/task.schema.ts",
+    "modules/users/user.schema.ts"
+  ],
+  "modules/analytics/analytics.service.ts": [
+    "modules/groups/group.schema.ts",
+    "modules/tasks/task.schema.ts",
+    "modules/users/user.schema.ts"
+  ],
+  "modules/auth/auth.controller.ts": [
+    "modules/auth/auth.service.ts",
+    "modules/auth/dto/auth.dto.ts",
+    "modules/auth/guards/jwt-auth.guard.ts",
+    "modules/auth/services/google-auth.service.ts"
+  ],
+  "modules/auth/auth.module.ts": [
+    "modules/auth/auth.controller.ts",
+    "modules/auth/auth.service.ts",
+    "modules/auth/services/google-auth.service.ts",
+    "modules/auth/strategies/jwt.strategy.ts",
+    "modules/users/user.schema.ts",
+    "modules/users/users.module.ts"
+  ],
+  "modules/auth/auth.service.ts": [
+    "modules/auth/dto/auth.dto.ts",
+    "modules/users/user.schema.ts",
+    "modules/users/users.service.ts"
+  ],
+  "modules/auth/decorators/roles.decorator.ts": [
+    "modules/users/user.schema.ts"
+  ],
+  "modules/auth/dto/auth.dto.ts": [],
+  "modules/auth/guards/jwt-auth.guard.ts": [],
+  "modules/auth/guards/roles.guard.ts": [
+    "modules/auth/decorators/roles.decorator.ts",
+    "modules/users/user.schema.ts"
+  ],
+  "modules/auth/services/google-auth.service.ts": [],
+  "modules/auth/strategies/jwt.strategy.ts": [],
+  "modules/groups/dto/group.dto.ts": [
+    "modules/groups/group.schema.ts"
+  ],
+  "modules/groups/group.schema.ts": [],
+  "modules/groups/groups.controller.ts": [
+    "modules/auth/decorators/roles.decorator.ts",
+    "modules/auth/guards/jwt-auth.guard.ts",
+    "modules/auth/guards/roles.guard.ts",
+    "modules/groups/dto/group.dto.ts",
+    "modules/groups/group.schema.ts",
+    "modules/groups/groups.service.ts",
+    "modules/users/user.schema.ts"
+  ],
+  "modules/groups/groups.module.ts": [
+    "modules/groups/group.schema.ts",
+    "modules/groups/groups.controller.ts",
+    "modules/groups/groups.service.ts",
+    "modules/users/users.module.ts"
+  ],
+  "modules/groups/groups.service.spec.ts": [
+    "modules/groups/group.schema.ts",
+    "modules/groups/groups.service.ts"
+  ],
+  "modules/groups/groups.service.ts": [
+    "modules/groups/dto/group.dto.ts",
+    "modules/groups/group.schema.ts",
+    "modules/users/users.service.ts"
+  ],
+  "modules/logs/error-log.schema.ts": [],
+  "modules/logs/error-logging.service.ts": [
+    "modules/logs/error-log.schema.ts"
+  ],
+  "modules/logs/logs.controller.ts": [
+    "modules/auth/decorators/roles.decorator.ts",
+    "modules/auth/guards/jwt-auth.guard.ts",
+    "modules/auth/guards/roles.guard.ts",
+    "modules/logs/error-log.schema.ts",
+    "modules/logs/error-logging.service.ts",
+    "modules/users/user.schema.ts"
+  ],
+  "modules/logs/logs.module.ts": [
+    "modules/logs/error-log.schema.ts",
+    "modules/logs/error-logging.service.ts",
+    "modules/logs/logs.controller.ts"
+  ],
+  "modules/music/dto/music.dto.ts": [
+    "modules/music/music-integration.schema.ts"
+  ],
+  "modules/music/music-integration.schema.ts": [],
+  "modules/music/music.controller.ts": [
+    "modules/auth/guards/jwt-auth.guard.ts",
+    "modules/music/dto/music.dto.ts",
+    "modules/music/music-integration.schema.ts",
+    "modules/music/music.service.ts"
+  ],
+  "modules/music/music.module.ts": [
+    "modules/music/music-integration.schema.ts",
+    "modules/music/music.controller.ts",
+    "modules/music/music.service.ts"
+  ],
+  "modules/music/music.service.ts": [
+    "modules/music/dto/music.dto.ts",
+    "modules/music/music-integration.schema.ts"
+  ],
+  "modules/notifications/dto/notification.dto.ts": [
+    "modules/notifications/notification.schema.ts"
+  ],
+  "modules/notifications/notification.controller.ts": [
+    "modules/auth/guards/jwt-auth.guard.ts",
+    "modules/notifications/notification.service.ts"
+  ],
+  "modules/notifications/notification.module.ts": [
+    "config/firebase.service.ts",
+    "modules/notifications/notification.controller.ts",
+    "modules/notifications/notification.service.ts",
+    "modules/notifications/schemas/device-token.schema.ts",
+    "modules/notifications/schemas/notification.schema.ts"
+  ],
+  "modules/notifications/notification.schema.ts": [],
+  "modules/notifications/notification.service.ts": [
+    "config/firebase.service.ts",
+    "modules/notifications/schemas/device-token.schema.ts",
+    "modules/notifications/schemas/notification.schema.ts"
+  ],
+  "modules/notifications/notifications.controller.ts": [
+    "modules/auth/decorators/roles.decorator.ts",
+    "modules/auth/guards/jwt-auth.guard.ts",
+    "modules/auth/guards/roles.guard.ts",
+    "modules/notifications/dto/notification.dto.ts",
+    "modules/notifications/notifications.service.ts",
+    "modules/users/user.schema.ts"
+  ],
+  "modules/notifications/notifications.module.ts": [
+    "modules/notifications/notification.schema.ts",
+    "modules/notifications/notifications.controller.ts",
+    "modules/notifications/notifications.service.ts"
+  ],
+  "modules/notifications/notifications.service.spec.ts": [
+    "modules/notifications/notification.schema.ts",
+    "modules/notifications/notifications.service.ts"
+  ],
+  "modules/notifications/notifications.service.ts": [
+    "modules/notifications/dto/notification.dto.ts",
+    "modules/notifications/notification.schema.ts"
+  ],
+  "modules/notifications/schemas/device-token.schema.ts": [],
+  "modules/notifications/schemas/notification.schema.ts": [],
+  "modules/tasks/dto/task.dto.ts": [
+    "modules/tasks/task.schema.ts"
+  ],
+  "modules/tasks/task.schema.ts": [],
+  "modules/tasks/tasks.controller.ts": [
+    "modules/auth/decorators/roles.decorator.ts",
+    "modules/auth/guards/jwt-auth.guard.ts",
+    "modules/auth/guards/roles.guard.ts",
+    "modules/tasks/dto/task.dto.ts",
+    "modules/tasks/task.schema.ts",
+    "modules/tasks/tasks.service.ts",
+    "modules/users/user.schema.ts"
+  ],
+  "modules/tasks/tasks.module.ts": [
+    "modules/groups/groups.module.ts",
+    "modules/music/music.module.ts",
+    "modules/notifications/notifications.module.ts",
+    "modules/tasks/task.schema.ts",
+    "modules/tasks/tasks.controller.ts",
+    "modules/tasks/tasks.service.ts",
+    "websocket/websocket.module.ts"
+  ],
+  "modules/tasks/tasks.service.basic.spec.ts": [
+    "modules/groups/groups.service.ts",
+    "modules/music/music.service.ts",
+    "modules/notifications/notifications.service.ts",
+    "modules/tasks/task.schema.ts",
+    "modules/tasks/tasks.service.ts",
+    "websocket/websocket.gateway.ts"
+  ],
+  "modules/tasks/tasks.service.spec.ts": [
+    "modules/groups/groups.service.ts",
+    "modules/music/music.service.ts",
+    "modules/notifications/notifications.service.ts",
+    "modules/tasks/dto/task.dto.ts",
+    "modules/tasks/task.schema.ts",
+    "modules/tasks/tasks.service.ts",
+    "websocket/websocket.gateway.ts"
+  ],
+  "modules/tasks/tasks.service.ts": [
+    "modules/groups/groups.service.ts",
+    "modules/music/music.service.ts",
+    "modules/notifications/notifications.service.ts",
+    "modules/tasks/dto/task.dto.ts",
+    "modules/tasks/task.schema.ts",
+    "websocket/websocket.gateway.ts"
+  ],
+  "modules/test/test.controller.ts": [
+    "config/firebase.service.ts",
+    "modules/notifications/notification.service.ts",
+    "modules/notifications/schemas/notification.schema.ts"
+  ],
+  "modules/test/test.module.ts": [
+    "modules/notifications/notification.module.ts",
+    "modules/test/test.controller.ts"
+  ],
+  "modules/users/dto/user.dto.ts": [
+    "modules/users/user.schema.ts"
+  ],
+  "modules/users/user.schema.ts": [],
+  "modules/users/users.controller.ts": [
+    "cache/decorators/cache-key.decorator.ts",
+    "cache/decorators/cache-ttl.decorator.ts",
+    "cache/interceptors/cache-invalidate.interceptor.ts",
+    "cache/interceptors/cache.interceptor.ts",
+    "modules/auth/decorators/roles.decorator.ts",
+    "modules/auth/guards/jwt-auth.guard.ts",
+    "modules/auth/guards/roles.guard.ts",
+    "modules/users/dto/user.dto.ts",
+    "modules/users/user.schema.ts",
+    "modules/users/users.service.ts"
+  ],
+  "modules/users/users.module.ts": [
+    "modules/users/user.schema.ts",
+    "modules/users/users.controller.ts",
+    "modules/users/users.service.ts"
+  ],
+  "modules/users/users.service.ts": [
+    "modules/users/dto/user.dto.ts",
+    "modules/users/user.schema.ts"
+  ],
+  "websocket/dto/websocket.dto.ts": [],
+  "websocket/websocket.gateway.ts": [],
+  "websocket/websocket.module.ts": [
+    "modules/groups/groups.module.ts",
+    "modules/music/music.module.ts",
+    "modules/notifications/notifications.module.ts",
+    "websocket/websocket.gateway.ts"
+  ]
+}

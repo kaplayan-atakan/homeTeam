@@ -14,6 +14,7 @@ import { LogsModule } from './modules/logs/logs.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { WebsocketModule } from './websocket/websocket.module';
 import { CacheModule } from './cache/cache.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { CacheModule } from './cache/cache.module';
     LogsModule,
     AnalyticsModule,
     WebsocketModule,
+  AdminModule,
   ],
   controllers: [],
   providers: [],

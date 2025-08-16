@@ -21,7 +21,8 @@
       "@/*": ["src/*"],
       "@modules/*": ["src/modules/*"],
       "@config/*": ["src/config/*"],
-      "@websocket/*": ["src/websocket/*"]
+      "@websocket/*": ["src/websocket/*"],
+      "@common/*": ["src/common/*"]
     }
   },
   "include": ["src/**/*"],

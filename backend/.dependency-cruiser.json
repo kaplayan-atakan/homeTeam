@@ -1,0 +1,43 @@
+{
+  "forbidden": [
+    {
+      "name": "no-circular",
+      "severity": "error",
+      "comment": "Circular dependencies yasak",
+      "from": {},
+      "to": {
+        "circular": true
+      }
+    },
+    {
+      "name": "no-orphans",
+      "severity": "warn",
+      "comment": "Kullanılmayan modüller",
+      "from": {
+        "orphan": true,
+        "pathNot": "\\.spec\\.(js|ts)$"
+  },
+  "to": {}
+    }
+  ],
+  "options": {
+    "doNotFollow": {
+      "path": "node_modules"
+    },
+    "tsPreCompilationDeps": true,
+    "tsConfig": {
+      "fileName": "./tsconfig.json"
+    },
+    "reporterOptions": {
+      "dot": {
+        "collapsePattern": "^(node_modules|src/common|src/config)",
+        "theme": {
+          "graph": {
+            "bgcolor": "transparent",
+            "rankdir": "TB"
+          }
+        }
+      }
+    }
+  }
+}

@@ -47,13 +47,13 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await apiClient.post<{
+      const loginData = await apiClient.post<{
         user: Record<string, unknown>;
         accessToken: string;
-      }>('/auth/login', data);
+      }>("/auth/login", data);
 
       // Backend'den gelen user objesini UserSession formatına çevir
-      const userResponse = response.user as {
+      const userResponse = loginData.user as {
         _id?: string;
         id?: string;
         email: string;
@@ -80,7 +80,7 @@ export default function LoginPage() {
 
       // AuthTokens objesi oluştur (refresh token yoksa boş string)
       const authTokens: AuthTokens = {
-        accessToken: response.accessToken,
+        accessToken: loginData.accessToken,
         refreshToken: '', // Backend'de refresh token yok şimdilik
         expiresIn: 86400, // 24 saat (varsayılan)
       };
@@ -182,11 +182,17 @@ export default function LoginPage() {
         {/* Demo Credentials */}
         <Card className="mt-4 bg-yellow-50 border-yellow-200">
           <CardContent className="pt-6">
-            <h3 className="font-semibold text-yellow-800 mb-2">Demo Hesabı:</h3>
-            <p className="text-sm text-yellow-700">
-              Email: admin@hometeam.com<br />
-              Şifre: admin123
-            </p>
+            <h3 className="font-semibold text-yellow-800 mb-2">Demo Hesapları:</h3>
+            <div className="text-sm text-yellow-700 space-y-2">
+              <p>
+                Email: admin@hometeam.com<br />
+                Şifre: Admin123!
+              </p>
+              <p>
+                Email: admin@hometeam.app<br />
+                Şifre: admin123456
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>

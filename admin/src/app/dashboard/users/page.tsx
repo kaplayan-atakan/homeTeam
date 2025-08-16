@@ -109,11 +109,14 @@ export default function UsersPage() {
     }
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('tr-TR', {
+  const formatDate = (value: string | number | Date | null | undefined) => {
+    if (!value) return '-';
+    const d = value instanceof Date ? value : new Date(value);
+    if (isNaN(d.getTime())) return '-';
+    return d.toLocaleDateString('tr-TR', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 

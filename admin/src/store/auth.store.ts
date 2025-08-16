@@ -30,10 +30,12 @@ export const useAuthStore = create<AuthState>()(
       login: (user: UserSession, tokens: AuthTokens) => {
         // Store tokens in localStorage for API client
         if (typeof window !== 'undefined') {
-          localStorage.setItem('access_token', tokens.accessToken);
-          if (tokens.refreshToken) {
-            localStorage.setItem('refresh_token', tokens.refreshToken);
-          }
+          try {
+            localStorage.setItem('access_token', tokens.accessToken);
+            if (tokens.refreshToken) {
+              localStorage.setItem('refresh_token', tokens.refreshToken);
+            }
+          } catch {}
         }
 
         set({
@@ -47,8 +49,10 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         // Clear tokens from localStorage
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
+          try {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+          } catch {}
         }
 
         set({
@@ -75,10 +79,12 @@ export const useAuthStore = create<AuthState>()(
       refreshTokens: (tokens: AuthTokens) => {
         // Update tokens in localStorage
         if (typeof window !== 'undefined') {
-          localStorage.setItem('access_token', tokens.accessToken);
-          if (tokens.refreshToken) {
-            localStorage.setItem('refresh_token', tokens.refreshToken);
-          }
+          try {
+            localStorage.setItem('access_token', tokens.accessToken);
+            if (tokens.refreshToken) {
+              localStorage.setItem('refresh_token', tokens.refreshToken);
+            }
+          } catch {}
         }
 
         set({ tokens });
@@ -94,16 +100,31 @@ export const useAuthStore = create<AuthState>()(
       // Hydration tamamlandığında localStorage'dan token'ları restore et
       onRehydrateStorage: () => (state) => {
         if (state && typeof window !== 'undefined') {
-          const accessToken = localStorage.getItem('access_token');
-          const refreshToken = localStorage.getItem('refresh_token');
-          
-          // Eğer localStorage'da token varsa ama state'de yoksa restore et
-          if (accessToken && (!state.tokens || !state.tokens.accessToken)) {
-            state.tokens = {
-              accessToken,
-              refreshToken: refreshToken || '',
-              expiresIn: 86400,
-            };
+          try {
+            const accessToken = localStorage.getItem('access_token');
+            const refreshToken = localStorage.getItem('refresh_token');
+
+            if (accessToken) {
+              // Restore tokens if missing in state
+              if (!state.tokens || !state.tokens.accessToken) {
+                state.tokens = {
+                  accessToken,
+                  refreshToken: refreshToken || '',
+                  expiresIn: 86400,
+                };
+              }
+              state.isAuthenticated = true;
+            } else {
+              // No token in storage, ensure state reflects logged-out status
+              state.tokens = null;
+              state.user = null;
+              state.isAuthenticated = false;
+            }
+          } catch {
+            // On storage errors, fall back to logged-out state
+            state.tokens = null;
+            state.user = null;
+            state.isAuthenticated = false;
           }
         }
       },

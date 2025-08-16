@@ -1,0 +1,17 @@
+{
+  "name": "backend",
+  "root": "backend",
+  "sourceRoot": "backend/src",
+  "projectType": "application",
+  "targets": {
+    "dep-graph": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "npx nx dep-graph",
+        "cwd": "backend"
+      }
+    }
+  },
+  "tags": ["type:app", "scope:backend"],
+  "implicitDependencies": []
+}

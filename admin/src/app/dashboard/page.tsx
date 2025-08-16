@@ -16,17 +16,29 @@ import {
   Activity,
 } from 'lucide-react';
 import { apiClient } from '@/lib/api/client';
+import { useAuthStore } from '@/store/auth.store';
 import { DashboardStats } from '@/types';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { isAuthenticated, tokens } = useAuthStore();
+  // If not authenticated, push to login immediately
+  useEffect(() => {
+    if (!isAuthenticated || !tokens?.accessToken) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, tokens, router]);
   // Real API call for dashboard stats
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       return apiClient.get<DashboardStats>('/analytics/dashboard');
     },
+    enabled: isAuthenticated && !!tokens?.accessToken, // Only fetch when authed
     refetchInterval: 30000, // Refresh every 30 seconds
-    retry: 3,
+    retry: 0, // Avoid retry loops on 401/unauthorized
   });
 
   if (isLoading) {

@@ -20,7 +20,16 @@ interface AuthenticatedSocket extends Socket {
 // SOLID: Single Responsibility Principle - WebSocket bağlantıları ve gerçek zamanlı iletişim
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin: string, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Allow all localhost origins in development
+      if (!origin) return callback(null, true);
+      try {
+        const url = new URL(origin);
+        if (['localhost', '127.0.0.1'].includes(url.hostname)) return callback(null, true);
+      } catch {}
+      if (process.env.FRONTEND_URL && origin.startsWith(process.env.FRONTEND_URL)) return callback(null, true);
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   },
   namespace: '/ws',
